@@ -1,3 +1,20 @@
+:root{
+  --main-backgroundColor:#ffffff;
+  --main-boxShadow:1px 1px 4px 0px #8888;
+  --main-textColor:#414a4c;
+  --main-fillColor: #FFE194;
+  --sec-backgroundColor: #FAF9F6; 
+  --notify-color: #B9D9EB;
+  --thir-backgroundColor:#ffffff;
+}
+
+
+* {
+  margin: 0;
+  padding:0;
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -11,3 +28,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.textDesign1{
+  color: var(--main-fillColor);
+  text-shadow:1px 0px black, -1px -0px black, 0px 1px black, 0px -1px black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black;
+}
+
