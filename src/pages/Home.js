@@ -2,22 +2,18 @@ import React from 'react';
 import Layout from '../context/Layout';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import audi from '../sounds/beep-07a.mp3';
 
 
 function Home() {
 
   const {reference} = useAuth();
 
-  const func_qrcode = ()=>{
-    // let QRCode = require('qrcode');
-    // let canvas = reference.current.querySelector('#qrtest');
+  const handleAudio = ()=>{
+    const audio = new Audio(audi);
+    audio.play();
 
-    // QRCode.toCanvas(canvas, 'sample text', function (error) {
-    //   if (error) console.error(error)
-    //   console.log('success!');
-    // })
-
-  };
+  }
 
   
   return (
@@ -25,7 +21,7 @@ function Home() {
       <data value='/'></data>
       <div>
         test
-        <input onClick={()=>func_qrcode()} type='button' value='Test'/>
+        <input onClick={()=>handleAudio()} type='button' value='Test'/>
         <input type="text" />
         <Link to='/request'>REQUEST</Link>
         <input type="file" />

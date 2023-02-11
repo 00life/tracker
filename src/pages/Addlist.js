@@ -36,16 +36,16 @@ function Addlist() {
     }catch{
       cleanarray.forEach(e=>{
         let person = {
-          firstname:'',
-          lastname:e,
-          schedule:[],
-          hash:require("blueimp-md5")(e),
-          base64:'',
+          firstname: '',
+          lastname: e,
+          schedule: [],
+          hash: require("blueimp-md5")(e),
+          base64: '',
         };
         setPersons(prev=>[...prev,person]);
       });
     };
-      // elem.value = '';
+      
     
 
     func_snackbar(reference,`${cleanarray.length} Participants have been added`)
@@ -69,7 +69,8 @@ function Addlist() {
             
             <textarea id="listAddParticipants" placeholder="Paste Names Here..." onChange={e=>handleStudentCount(e)}
               style={{fontSize:"20px", borderRadius:'5px', outlineColor:'palegreen', padding:'5px', width:'100%', height:'50vh'}} />
-            <input type="button" value="Submit" onClick={()=>handleSubmit()} style={{fontSize:"24px", padding:'5px', margin:'10px'}}/>
+            <input type="button" value="Submit" onClick={()=>handleSubmit()} onMouseOver={e=>e.currentTarget.style.backgroundColor='palegreen'} onMouseOut={e=>e.currentTarget.style.backgroundColor='lightgreen'}
+              style={{fontSize:"24px", padding:'5px', margin:'10px', borderRadius:'5px', backgroundColor:'lightgreen', cursor:'pointer'}}/>
           
           </div>
         </div>

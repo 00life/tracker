@@ -1,0 +1,17 @@
+.link:hover{
+    background-color: palegreen;
+}
+
+.dropdown-menu{
+    transform-origin: top right;
+    transform: scale(0,0);
+    opacity: 0;
+    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+}
+
+  
+#checkbox-link:checked + .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: scale(100%,100%);
+}

@@ -8,27 +8,30 @@ export function func_snackbar(reference, message) {
   }catch(err){console.log('func_snackbar:'+err)}
 };
 
+
 export function func_savedata(data, name){
 // Saves data to your computer to the name you give it
   try{
     var string_data = JSON.stringify(data);
-    var file = new Blob([string_data],{type:'text'});
+    var file = new Blob([string_data],{type:'text/csv;charset=utf-8'});
     var anchor = window.document.createElement('a');
     anchor.href = URL.createObjectURL(file);
     anchor.download = name;
     anchor.click();
     URL.revokeObjectURL(anchor.href);
     
-    func_saveObjLocalStorage('config', {saveName:name})
+    func_saveObjLocalStorage('config', {saveName:name}) //fix
   
   }catch(err){console.log('func_savedata:'+err)}
 };
+
 
 export function func_loaddata(elem, putLocation){
 // Loads data from a file on your computer
   try{
     var file = elem.files[0];
     
+    //fix
     let blob = structuredClone(file);
     let pullout = data => func_saveObjLocalStorage('config', {persons:data});
     func_blobToDataURI(blob, pullout);
@@ -43,6 +46,7 @@ export function func_loaddata(elem, putLocation){
   }catch(err){console.log('func_loaddata:'+err)}
 };
 
+
 export function func_convertFrom24To12Format(time24){
 // Converts 24:00 format into 12:00 AM/PM format
   try{
@@ -52,6 +56,7 @@ export function func_convertFrom24To12Format(time24){
     return `${hours}:${minutes} ${period}`;
   }catch(err){console.log('func_convertFrom24To12Format:'+err)};
 };
+
 
 export function func_cleanArray(array){
 // Removes excess spaces from an array and capitalize the first letter
@@ -69,6 +74,7 @@ export function func_cleanArray(array){
   }catch(err){console.log('func_cleanArray:'+err)}
 };
 
+
 export function func_stringBase64File(elem, putLocation){
 // Converts an input file into base 64 data from your computer
   try{
@@ -81,10 +87,11 @@ export function func_stringBase64File(elem, putLocation){
   }catch(err){console.log('func_stringBase64File:'+err)}
 };
 
+
 export const func_getBase64FromUrl = async (url) => {
 // Converts URL data into base64 data
   try{
-    const data = await fetch(url);
+    const data = await fetch(url,{mode:'no-cors'});
     const blob = await data.blob();
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -96,6 +103,7 @@ export const func_getBase64FromUrl = async (url) => {
     });
   }catch(err){console.log('func_getBase64FromUrl:'+err)}
 };
+
 
 export function func_modalview(reference, id){
   try{
@@ -115,6 +123,7 @@ export function func_modalview(reference, id){
   }catch(err){console.log('func_modelview:'+err)}
 };
 
+
 export async function func_generateQR(data, type='svg'){
   var resp;
   try{
@@ -129,14 +138,16 @@ export async function func_generateQR(data, type='svg'){
   }catch(err){console.error('func_generateQR:'+err)};
 };
 
+
 export function func_blobToDataURI(blob, func_pullout){
   const reader = new FileReader();
 
   reader.onload = (event) => {
     func_pullout(event.target.result)
-}
-reader.readAsDataURL(blob);
+  }
+  reader.readAsDataURL(blob);
 };
+
 
 export function func_dataURItoBlob(dataURI) {
   // convert base64 to raw binary data held in a string
@@ -156,6 +167,7 @@ export function func_dataURItoBlob(dataURI) {
   var blob = new Blob([dataView], { type: mimeString });
   return blob;
 };
+
 
 export function func_saveObjLocalStorage(storageName='config', obj){
   try{

@@ -10,10 +10,16 @@ export function AuthProvider({children}){
   const reference = useRef();
   const authstatus = useAuthStatus();
   const [persons, setPersons] = useState([]);
-  const [config, setConfig] = useState({auto:true});
+  const [logArray, setLogArray] = useState([]);
+  const [config, setConfig] = useState({auto:true, rateLimit:0, timeLimit:0});
+  const [configuration, setConfiguration] = useState({rateLimit:0, timeLimit:0});
+  const [outPeople, setOutPeople] = useState([]);
+  const [backPeople, setbackPeople] = useState([]);
+  const [profileData, setProfileData] = useState({lastname:'', firstname:'', email:'', base64:'', schedule:[]});
+
 
   useEffect(()=>{
-    func_config(setConfig);
+    func_config(setConfig); //fix
     func_autoLoadPersons(persons, setPersons, func_snackbar, reference);
   },[]);
   
@@ -27,8 +33,18 @@ export function AuthProvider({children}){
       authstatus,
       persons,
       setPersons,
+      logArray,
+      setLogArray,
       config,
       setConfig,
+      configuration,
+      setConfiguration,
+      outPeople, 
+      setOutPeople,
+      backPeople,
+      setbackPeople,
+      profileData,
+      setProfileData,
     }}>
       
       {children}

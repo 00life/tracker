@@ -9,20 +9,24 @@ import {
 
 } from "firebase/auth";
 
+
 export async function func_signup(email, password){
     try{await createUserWithEmailAndPassword(auth, email, password);
     }catch(error){console.log('Functions_Auth - func_signup: '+error)}
 };
+
 
 export async function func_signin(email, password){
     try{return await signInWithEmailAndPassword(auth, email, password)
     }catch(error){console.log('Functions_Auth - func_signin: '+ error)}
 };
 
+
 export async function func_logout(){
     try{return await signOut(auth);
     }catch(error){console.log('Functions_Auth - func_logout: '+error);}
 };
+
 
 export function useAuthStatus(){
     const [currentUser, setCurrentUser] = useState({});
@@ -37,6 +41,7 @@ export function useAuthStatus(){
     
     return currentUser   
 };
+
 
 export function func_reset(email){
     return sendPasswordResetEmail(auth, email);
