@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { auth } from '../context/Firebase';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../context/Layout';
-
 import InputBar from "../components/inputBar";
 import Avatar from '../components/Avatar';
 import { func_convertFrom24To12Format, func_stringBase64File, func_savedata, func_loaddata } from '../context/Functions_1';
 import { func2_toDataURL, func2_stringDateName } from '../context/Functions_2';
+import { funcAuth_updateEmail, funcAuth_updateProfile } from '../context/Functions_Auth';
 
 
 function Profile() {//fix
@@ -18,6 +19,7 @@ function Profile() {//fix
   const [endtime, setEndtime] = useState('');
   const [details, setDetails] = useState('');
   const [onSchedule, setOnSchedule] = useState([]);
+  const [holdtime, setHoldtime] = useState({starttime:'', endtime:''});
 
   useEffect(()=>{
     reference.current.querySelector('#profile_fname').value = profileData.firstname;
@@ -31,9 +33,37 @@ function Profile() {//fix
 
 
   const handleTime = e => {
-    // Clicking on the time-picker
-    let ids = e.currentTarget.dataset.time;
-    e.currentTarget.querySelector('#'+ids).showPicker();
+    try{
+      // Clicking on the time-picker
+      let ids = e.currentTarget.dataset.time;
+      e.currentTarget.querySelector('#'+ids).showPicker();
+    }catch(err){
+      // If the showPicker fails
+      try{
+        let mytime = prompt('Enter time (format 00:00AM):')??'';
+        let id = e.currentTarget.dataset.time;
+        
+        //Filtering prompt
+        let filter_trim = mytime.trim();
+        let filter_lowercase = filter_trim.toUpperCase();
+        let filter_replaceChar = filter_lowercase.replace(':','').replace(' ','');
+        let get_hours = filter_replaceChar.slice(0,2) ?? '';
+        let get_mins = filter_replaceChar.slice(2,4) ?? '';
+        let get_AMPM = filter_replaceChar.slice(-2,) ?? '';
+
+        //Confirm get_AMPM
+        get_AMPM = (get_AMPM !== 'AM'||get_AMPM !== 'PM') ? '': get_AMPM;
+
+        // Placing the time in the correct location
+        if(id==='profile_hddn_start_time'){
+          setHoldtime({...holdtime, starttime: `${get_hours}:${get_mins}${get_AMPM}`})
+        }else if(id==='profile_hddn_end_time_edit'){
+          setHoldtime({...holdtime, endtime: `${get_hours}:${get_mins}${get_AMPM}`})
+        };
+      
+      }catch(err){console.log('handleTimeAlt: ' + err)}
+      console.log('handleTime: '+ err)
+    };
   };
 
   const handleSchedule = e => {
@@ -137,13 +167,17 @@ function Profile() {//fix
   const handleSaveProfile = ()=>{
     try{
       // Updating profileData object
-      setProfileData({...profileData, firstname:firstname, lastname:lastname, email:email, schedule:onSchedule});
+      setProfileData({...profileData, firstname: firstname, lastname: lastname, email: email, schedule: onSchedule});
 
+      // Update Firebase displayName
+      let myDisplayName = (firstname + (lastname !== '' ? `_${lastname}` : '')).trim();
+      funcAuth_updateProfile({...auth.currentUser, displayName: (myDisplayName !== '') ? myDisplayName : auth.currentUser.email});
+      
       // Creating the object to save to file
       let profileObj = {
         firstname: firstname !=='' ? firstname : profileData.firstname,
         lastname: lastname !=='' ? lastname : profileData.lastname,
-        email: email !=='' ? email : profileData.email,
+        email: email === '' ? auth.currentUser.email : funcAuth_updateEmail(email),
         schedule: onSchedule !==[] ? onSchedule : profileData.schedule,
         base64: profileData.base64,
         
@@ -153,30 +187,24 @@ function Profile() {//fix
       let saveStringName = `profile_${func2_stringDateName()}.json`;
       
       // Saving the file to the computer
-      func_savedata(profileObj, saveStringName);
+      func_savedata(profileObj, saveStringName, '/profile', reference);
+      
     }catch(err){console.log('handleSaveProfile: ' + err)}
   };
 
   const handleLoadProfile = () => {
     try{
-      // Generating the input element and clicking on it 
-      let elem = document.createElement('input');
-      elem.setAttribute('type','file');
-      elem.click()
-      elem.onchange = e =>{
-
-        // Loading the data to setProfilData object
-        let callback = data => {
-          setProfileData({...profileData,
-            firstname:data.firstname,
-            lastname:data.lastname,
-            email:data.email,
-            base64:data.base64,
-            schedule:data.schedule,
-          });
-        };
-        func_loaddata(e.currentTarget, callback)
+      // Loading the data to setProfilData object
+      let callback = data => {
+        setProfileData({...profileData,
+          firstname:data.firstname,
+          lastname:data.lastname,
+          email:data.email,
+          base64:data.base64,
+          schedule:data.schedule,
+        });
       };
+      func_loaddata('/profile', callback, reference);
     }catch(err){console.log('handleLoadProfile: ' + err)}
   };
 
@@ -200,16 +228,16 @@ function Profile() {//fix
                     <div style={{display:'flex', alignItems:'center'}}>
                       
                       {/* Save Profile Button */}
-                      <div onClick={()=>handleSaveProfile()} onMouseOver={e=>e.currentTarget.style.backgroundColor='palegreen'} onMouseOut={e=>e.currentTarget.style.backgroundColor='lightgreen'}
-                        style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'lightgreen', cursor:'default', display:'flex', flexWrap:'nowrap', width:'50%'}}>
-                        <h4 className="textDesign1" style={{ margin:'auto', color:'white', fontSize:'20px'}}>Save</h4>
+                      <div onClick={()=>handleSaveProfile()} onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--tetradicGreen)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--analogousGreen)'}
+                        style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--analogousGreen)', display:'flex', flexWrap:'nowrap', width:'50%', cursor:'pointer'}}>
+                        <h4 className="textDesign1" style={{ margin:'auto', color:'var(--sec-backgroundColor)', fontSize:'20px'}}>Save</h4>
                         <svg style={{filter:'drop-shadow(2px 2px 1px #8888)', margin:'0 5px'}} height="24" width="24"><path d="M22.15 6.525V18.75q0 1.425-.987 2.413-.988.987-2.413.987H5.25q-1.425 0-2.412-.987-.988-.988-.988-2.413V5.25q0-1.425.988-2.413.987-.987 2.412-.987h12.225Zm-3.4 1.425-2.7-2.7H5.25v13.5h13.5ZM12 17.825q1.3 0 2.213-.912.912-.913.912-2.213t-.912-2.213q-.913-.912-2.213-.912t-2.212.912q-.913.913-.913 2.213t.913 2.213q.912.912 2.212.912Zm-5.825-7.4h9.3v-4.25h-9.3ZM5.25 7.95v10.8-13.5Z"/></svg>
                       </div>
 
                       {/* Load Profile Button */}
-                      <div onClick={()=>handleLoadProfile()} onMouseOver={e=>e.currentTarget.style.backgroundColor='lightblue'} onMouseOut={e=>e.currentTarget.style.backgroundColor='skyblue'}
-                        style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'skyblue', cursor:'default', display:'flex', flexWrap:'nowrap', width:'50%'}}>
-                        <h4 className="textDesign1" style={{ margin:'auto', color:'white', fontSize:'20px'}}>Load</h4>
+                      <div onClick={()=>handleLoadProfile()} onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--analogousBlue)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--columbianBlue)'}
+                        style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--columbianBlue)', display:'flex', flexWrap:'nowrap', width:'50%', cursor:'pointer'}}>
+                        <h4 className="textDesign1" style={{ margin:'auto', color:'var(--sec-backgroundColor)', fontSize:'20px'}}>Load</h4>
                         <svg style={{filter:'drop-shadow(2px 2px 1px #8888)', margin:'0 5px'}} height="24" width="24"><path d="M10.875 19.1H13.1v-4.35l1.6 1.6 1.525-1.525-4.25-4.25-4.25 4.25 1.55 1.525 1.6-1.6ZM6.25 23.15q-1.4 0-2.4-.987-1-.988-1-2.413V4.25q0-1.425 1-2.413 1-.987 2.4-.987h7.975l6.925 6.875V19.75q0 1.425-1 2.413-1 .987-2.4.987ZM12.475 9.5V4.25H6.25v15.5h11.5V9.5ZM6.25 4.25V9.5 4.25v15.5-15.5Z"/></svg>
                       </div>
 
@@ -226,7 +254,7 @@ function Profile() {//fix
                     {/* Input new participant information */}
                     <InputBar ids="profile_lname" type={"text"} placeholder='Lastname' func_onChange={setLastname} required={true} />
                     <InputBar ids="profile_fname" type={"text"} placeholder='Firstname' func_onChange={setFirstname} required={true} />
-                    <InputBar ids="profile_email" type={"email"} placeholder='Email (*Optional)' func_onChange={setEmail} required={false} />
+                    <InputBar ids="profile_email" type={"email"} placeholder={(()=>{try{return auth.currentUser.email}catch{return ''}})()} func_onChange={setEmail} required={false} />
                   </div>
                 </td>
 
@@ -252,19 +280,19 @@ function Profile() {//fix
                   <div style={{display:'flex', alignItems:'center', flexWrap:'nowrap'}}>
 
                     {/* Start-time button for the schedule array */}
-                    <button data-time="profile_hddn_start_time" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888', padding:'2px', marginRight:'5px'}}>
+                    <button data-time="profile_hddn_start_time" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888', padding:'2px', marginRight:'5px', cursor:'pointer'}}>
                       <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M8.1 3.05V.025h7.8V3.05Zm2.4 11.975h3v-6.3h-3ZM12 24q-2.1 0-3.938-.788-1.837-.787-3.212-2.15-1.375-1.362-2.162-3.2-.788-1.837-.788-3.937 0-2.1.788-3.938.787-1.837 2.162-3.2 1.375-1.362 3.212-2.162 1.838-.8 3.938-.8 1.625 0 3.15.487 1.525.488 2.825 1.463l1.8-1.8 2.15 2.175-1.8 1.8q1.025 1.325 1.5 2.837.475 1.513.475 3.138 0 2.1-.788 3.937-.787 1.838-2.162 3.2-1.375 1.363-3.212 2.15Q14.1 24 12 24Zm0-3.4q2.8 0 4.75-1.937 1.95-1.938 1.95-4.738 0-2.775-1.95-4.738Q14.8 7.225 12 7.225T7.25 9.187Q5.3 11.15 5.3 13.925q0 2.8 1.95 4.738Q9.2 20.6 12 20.6Zm0-6.675Z"/></svg>
                       <input id="profile_hddn_start_time" type="time" style={{display:'none'}} onChange={e=>setStarttime(e.currentTarget.value)}/>
                     </button>
                     
                     {/* End-time button for the schedule array */}
-                    <button data-time="profile_hddn_end_time" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px'}}>
+                    <button data-time="profile_hddn_end_time" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px', cursor:'pointer'}}>
                       <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M8.1 3.05V.025h7.8V3.05Zm2.4 11.975h3v-6.3h-3ZM12 24q-2.1 0-3.938-.788-1.837-.787-3.212-2.15-1.375-1.362-2.162-3.2-.788-1.837-.788-3.937 0-2.1.788-3.938.787-1.837 2.162-3.2 1.375-1.362 3.212-2.162 1.838-.8 3.938-.8 1.625 0 3.15.487 1.525.488 2.825 1.463l1.8-1.8 2.15 2.175-1.8 1.8q1.025 1.325 1.5 2.837.475 1.513.475 3.138 0 2.1-.788 3.937-.787 1.838-2.162 3.2-1.375 1.363-3.212 2.15Q14.1 24 12 24Z"/></svg>
                       <input id="profile_hddn_end_time" type="time" style={{display:'none'}} onChange={e=>setEndtime(e.currentTarget.value)}/>
                     </button>
 
                     {/* Add-to-schedule button for the schedule array */}
-                    <button onClick={()=>handleSchedule()} type="button" style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px'}}>
+                    <button onClick={()=>handleSchedule()} type="button" style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px', cursor:'pointer'}}>
                       <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M10.3 19.7v-6H4.275v-3.4H10.3V4.275h3.4V10.3h6.025v3.4H13.7v6Z"/></svg>
                     </button>
 

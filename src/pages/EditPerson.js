@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
 import { useAuth } from '../context/AuthContext';
 import Layout from '../context/Layout';
-
 import InputBar from '../components/inputBar';
 import Avatar from '../components/Avatar';
 import { func_convertFrom24To12Format, func_stringBase64File } from '../context/Functions_1';
@@ -21,6 +19,7 @@ function EditPerson() {
     
     const [onSchedule, setOnSchedule] = useState([...person.schedule]);
     const [onBase64, setOnBase64] = useState(person.base64);
+    const [holdtime, setHoldtime] = useState({starttime:'', endtime:''});
 
   
     const handleDeletePerson = () => {
@@ -112,9 +111,37 @@ function EditPerson() {
     };
 
     const handleTime = e => {
-      // Clicking on the time-picker
-      let ids = e.currentTarget.dataset.time;
-      e.currentTarget.querySelector('#'+ids).showPicker();
+      try{
+        // Clicking on the time-picker
+        let ids = e.currentTarget.dataset.time;
+        e.currentTarget.querySelector('#'+ids).showPicker();
+      }catch(err){
+        
+        // If the showPicker fails
+        try{
+          let mytime = prompt('Enter time (format 00:00AM):')??'';
+          let id = e.currentTarget.dataset.time;
+          
+          //Filtering prompt
+          let filter_trim = mytime.trim();
+          let filter_lowercase = filter_trim.toUpperCase();
+          let filter_replaceChar = filter_lowercase.replace(':','').replace(' ','');
+          let get_hours = filter_replaceChar.slice(0,2) ?? '';
+          let get_mins = filter_replaceChar.slice(2,4) ?? '';
+          let get_AMPM = filter_replaceChar.slice(-2,) ?? '';
+
+          //Confirm get_AMPM
+          get_AMPM = (get_AMPM !== 'AM'||get_AMPM !== 'PM') ? '': get_AMPM;
+
+          // Placing the time in the correct location
+          if(id==='hddn_start_time_edit'){
+            setHoldtime({...holdtime, starttime: `${get_hours}:${get_mins}${get_AMPM}`})
+          }else if(id==='hddn_end_time_edit'){
+            setHoldtime({...holdtime, endtime: `${get_hours}:${get_mins}${get_AMPM}`})
+          };
+        
+        }catch(err){console.log('handleTimeAlt: ' + err)}
+        console.log('handleTime: ' + err)}
     };
 
     const handleSchedule = ()=>{
@@ -189,15 +216,15 @@ function EditPerson() {
           <div style={{display:'flex'}}>
 
             {/* Save Button */}
-            <div onClick={()=>handleSavePerson()} onMouseOver={e=>e.currentTarget.style.backgroundColor='palegreen'} onMouseOut={e=>e.currentTarget.style.backgroundColor='lightgreen'}
-              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'lightgreen', cursor:'default', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
-              <h4 className="textDesign1" style={{ margin:'auto', color:'white', fontSize:'20px'}}>Save</h4>
+            <div onClick={()=>handleSavePerson()} onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--tetradicGreen)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--analogousGreen)'}
+              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--analogousGreen)', cursor:'default', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
+              <h4 className="textDesign1" style={{ margin:'auto', color:'var(--sec-backgroundColor)', fontSize:'20px'}}>Save</h4>
             </div>
 
             {/* Delete Button */}
-            <div onClick={()=>handleDeletePerson()} onMouseOver={e=>e.currentTarget.style.backgroundColor='#FF7F7F'} onMouseOut={e=>e.currentTarget.style.backgroundColor='tomato'}
-              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'tomato', cursor:'default', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
-              <h4 className="textDesign1" style={{ margin:'auto', color:'white', fontSize:'20px'}}>Delete</h4>
+            <div onClick={()=>handleDeletePerson()} onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--complimentRed)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--triadicRed)'}
+              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--triadicRed)', cursor:'default', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
+              <h4 className="textDesign1" style={{ margin:'auto', color:'var(--sec-backgroundColor)', fontSize:'20px'}}>Delete</h4>
             </div>
 
           </div>
@@ -253,19 +280,19 @@ function EditPerson() {
                   <div style={{display:'flex', alignItems:'center', flexWrap:'nowrap'}}>
 
                     {/* time-start schedule button */}
-                    <button data-time="hddn_start_time_edit" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888', padding:'2px', marginRight:'5px'}}>
+                    <button data-time="hddn_start_time_edit" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888', padding:'2px', marginRight:'5px', cursor:'pointer'}}>
                       <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M8.1 3.05V.025h7.8V3.05Zm2.4 11.975h3v-6.3h-3ZM12 24q-2.1 0-3.938-.788-1.837-.787-3.212-2.15-1.375-1.362-2.162-3.2-.788-1.837-.788-3.937 0-2.1.788-3.938.787-1.837 2.162-3.2 1.375-1.362 3.212-2.162 1.838-.8 3.938-.8 1.625 0 3.15.487 1.525.488 2.825 1.463l1.8-1.8 2.15 2.175-1.8 1.8q1.025 1.325 1.5 2.837.475 1.513.475 3.138 0 2.1-.788 3.937-.787 1.838-2.162 3.2-1.375 1.363-3.212 2.15Q14.1 24 12 24Zm0-3.4q2.8 0 4.75-1.937 1.95-1.938 1.95-4.738 0-2.775-1.95-4.738Q14.8 7.225 12 7.225T7.25 9.187Q5.3 11.15 5.3 13.925q0 2.8 1.95 4.738Q9.2 20.6 12 20.6Zm0-6.675Z"/></svg>
                       <input id="hddn_start_time_edit" type="time" style={{display:'none'}} />
                     </button>
 
                     {/* time-end schedule button */}
-                    <button data-time="hddn_end_time_edit" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px'}}>
+                    <button data-time="hddn_end_time_edit" onClick={e=>handleTime(e)} type="button" style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px', cursor:'pointer'}}>
                       <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M8.1 3.05V.025h7.8V3.05Zm2.4 11.975h3v-6.3h-3ZM12 24q-2.1 0-3.938-.788-1.837-.787-3.212-2.15-1.375-1.362-2.162-3.2-.788-1.837-.788-3.937 0-2.1.788-3.938.787-1.837 2.162-3.2 1.375-1.362 3.212-2.162 1.838-.8 3.938-.8 1.625 0 3.15.487 1.525.488 2.825 1.463l1.8-1.8 2.15 2.175-1.8 1.8q1.025 1.325 1.5 2.837.475 1.513.475 3.138 0 2.1-.788 3.937-.787 1.838-2.162 3.2-1.375 1.363-3.212 2.15Q14.1 24 12 24Z"/></svg>
                       <input id="hddn_end_time_edit" type="time" style={{display:'none'}}/>
                     </button>
 
                     {/* add-item to schedule button */}
-                    <button type="button" onClick={()=>handleSchedule()} style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px'}}>
+                    <button type="button" onClick={()=>handleSchedule()} style={{boxShadow:'1px 1px 4px 0px #8888',padding:'2px', marginRight:'5px', cursor:'pointer'}}>
                       <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M10.3 19.7v-6H4.275v-3.4H10.3V4.275h3.4V10.3h6.025v3.4H13.7v6Z"/></svg>
                     </button>
 

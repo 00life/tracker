@@ -66,7 +66,7 @@ function BarTrack(){
                 {/* Title Header for » */}
                 <div style={{width: '100%', display:'flex', justifyContent:'center', boxShadow:'1px 1px 4px 0px #8888'}}>
                     <div style={{color:'var(--main-textColor)', fontSize:'20px', fontWeight:'bolder'}}>
-                        <span style={{color:'green'}}>(»)</span>
+                        <span style={{color:'black'}}>(»)</span>
                     </div>
                 </div>
 

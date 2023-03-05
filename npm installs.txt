@@ -4,3 +4,13 @@ npm install blueimp-md5
 npm install jsbarcode
 npm install canvas
 npm install qrcode
+npm i babel-plugin-preval
+
+
+added to package.json
+
+ "browser":{
+    "fs":false,
+    "os":false,
+    "path":false
+  }

@@ -1,3 +1,7 @@
+import { funcAuth_loadData, funcAuth_setData } from './Functions_Auth';
+import {auth} from './Firebase';
+
+
 export function func_snackbar(reference, message) {
 // Shows an 3 sec animated notification at the bottom
   try{
@@ -9,40 +13,85 @@ export function func_snackbar(reference, message) {
 };
 
 
-export function func_savedata(data, name){
-// Saves data to your computer to the name you give it
+export function func_savedata(data, name, path, reference){
+  // Saves data online or on your computer (must provide name);
   try{
-    var string_data = JSON.stringify(data);
-    var file = new Blob([string_data],{type:'text/csv;charset=utf-8'});
-    var anchor = window.document.createElement('a');
-    anchor.href = URL.createObjectURL(file);
-    anchor.download = name;
-    anchor.click();
-    URL.revokeObjectURL(anchor.href);
+
+    let ans = window.confirm('Save online?');
     
+    // If answer is yes, it will save online
+    if(ans){
+
+      // Guard-Clause if the user is not online
+      if(auth.currentUser === null){
+        func_snackbar(reference, 'Please sign-in to save online');
+        return
+      };
+
+      let uid = auth.currentUser.uid;
+      let path_online = `users/${uid}${path}`;
+      
+      funcAuth_setData(path_online, data);
+      return true
+    
+    // If the answer is no, it will save to your computer
+    }else{
+
+      var string_data = JSON.stringify(data);
+      var file = new File([string_data],{type:'text/csv;charset=utf-8'});
+      let href_link = window.URL.createObjectURL(file);
+      var anchor = window.document.createElement('a');
+      anchor.setAttribute('href', href_link);
+      anchor.setAttribute('download', name);
+      anchor.click();
+      URL.revokeObjectURL(href_link);
+  
+    }; 
     func_saveObjLocalStorage('config', {saveName:name}) //fix
+    return false
   
   }catch(err){console.log('func_savedata:'+err)}
 };
 
 
-export function func_loaddata(elem, putLocation){
+export function func_loaddata(path, callback, reference){
 // Loads data from a file on your computer
   try{
-    var file = elem.files[0];
-    
-    //fix
-    let blob = structuredClone(file);
-    let pullout = data => func_saveObjLocalStorage('config', {persons:data});
-    func_blobToDataURI(blob, pullout);
 
-    var reader = new FileReader();
-    reader.onloadend = function(){
-      var load = JSON.parse(reader.result);
-      putLocation(load);
-    };
-    reader.readAsText(file);
+    let ans = window.confirm('Load from online?');
 
+    // If answer is yes, it will load from online
+    if(ans){
+
+      // Guard-Clause if the user is not online
+      if(auth.currentUser === null){
+        func_snackbar(reference, 'Please sign-in to load from online');
+        return
+      };
+
+      let uid = auth.currentUser.uid;
+      let path_online = `users/${uid}${path}`;
+      let pullout = data => {
+        callback(data)
+      }; 
+      funcAuth_loadData(path_online, pullout)
+
+    // If the answer is no, it will load from your computer
+    }else{
+
+      const elem_input = document.createElement('input');
+      elem_input.setAttribute('type', 'file');
+      elem_input.click();
+      elem_input.onchange = function(e){
+        var file = e.files[0];
+        var reader = new FileReader();
+        reader.onloadend = function(){
+          var load = JSON.parse(reader.result);
+          callback(load);
+        };
+        reader.readAsText(file);
+      };
+    }
   }catch(err){console.log('func_loaddata:'+err)}
 };
 
@@ -75,13 +124,13 @@ export function func_cleanArray(array){
 };
 
 
-export function func_stringBase64File(elem, putLocation){
+export function func_stringBase64File(elem, callback){
 // Converts an input file into base 64 data from your computer
   try{
     let file = elem.files[0];
     let reader = new FileReader();
     reader.onloadend = function() {
-      putLocation(reader.result)
+      callback(reader.result)
     }
     reader?.readAsDataURL(file);
   }catch(err){console.log('func_stringBase64File:'+err)}
@@ -139,11 +188,11 @@ export async function func_generateQR(data, type='svg'){
 };
 
 
-export function func_blobToDataURI(blob, func_pullout){
+export function func_blobToDataURI(blob, callback){
   const reader = new FileReader();
 
   reader.onload = (event) => {
-    func_pullout(event.target.result)
+    callback(event.target.result)
   }
   reader.readAsDataURL(blob);
 };
@@ -174,4 +223,4 @@ export function func_saveObjLocalStorage(storageName='config', obj){
     let autoConfig = JSON.parse(window?.localStorage?.getItem(storageName));
     window?.localStorage?.setItem(storageName, JSON.stringify({...autoConfig, ...obj}));
   }catch(err){console.log('func_saveObjLocalStorage:'+err)};
-  };
+};

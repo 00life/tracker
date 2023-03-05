@@ -4,7 +4,7 @@ function InputBar({type='text', placeholder='placeholder', func_onChange, ids, r
 
   return (
     <div>
-        <div onFocus={(e)=>e.currentTarget.style.outline = '2px solid palegreen'} onBlur={(e)=>e.currentTarget.style.outline='none'}
+        <div onFocus={(e)=>e.currentTarget.style.outline = '2px solid var(--tetradicGreen)'} onBlur={(e)=>e.currentTarget.style.outline='none'}
           style={{borderRadius:"10px 10px", margin:'5px 5px', padding:"3px 3px", boxShadow:"1px 1px 4px 0px #8888", backgroundColor:'white'}}>
             
             <input id={ids} type={type} placeholder={placeholder} onChange={(e)=>func_onChange(e.currentTarget.value)} required={required}

@@ -1,17 +1,24 @@
-.link:hover{
-    background-color: palegreen;
-}
-
 .dropdown-menu{
+    display: none;
     transform-origin: top right;
-    transform: scale(0,0);
-    opacity: 0;
-    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+    -webkit-animation-name: transformScale;
+    -webkit-animation-duration: 0.3s;
+    animation-name: transformScale;
+    animation-duration: 0.3s
+}
+  
+#checkbox-link:checked  + .dropdown-menu {
+    display: block;
 }
 
-  
-#checkbox-link:checked + .dropdown-menu {
-    display: block;
-    opacity: 1;
-    transform: scale(100%,100%);
+/* Add Animation */
+@-webkit-keyframes transformScale {
+    from {transform: scale(0,0); opacity: 0} 
+    to {transform: scale(100%,100%); opacity: 1}
 }
+  
+@keyframes transformScale {
+    from {transform: scale(0,0); opacity: 0}
+    to {transform: scale(100%,100%); opacity: 1}
+}
+

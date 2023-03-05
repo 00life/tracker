@@ -13,7 +13,7 @@ export function func_config(setConfig){
 };
 
 
-export function func_autoLoadPersons(persons, setPersons, func_snackbar, reference){
+export function func2_autoLoadPersons(persons, setPersons, func_snackbar, reference){
 // Load persons at startup from file location
     try{
         let autoConfig = JSON.parse(window?.localStorage?.getItem('config'));
@@ -31,6 +31,12 @@ export function func_autoLoadPersons(persons, setPersons, func_snackbar, referen
         func_snackbar(reference,'Load at least once to set autoload')
         console.log('func_autoLoadPersons:'+err)
     }
+
+    // try{
+    //     let localStoragePersons = JSON.parse(window?.localStorage?.getItem('persons'));
+    //     setPersons([...localStoragePersons]);
+    //     func_snackbar(reference,'Autoload from memory')
+    // }catch(err){console.log('func2_autoLoadPersons: ' + err)}
 };
 
 export function func2_toDataURL(src, callback){
@@ -51,7 +57,7 @@ export function func2_toDataURL(src, callback){
 export function func2_stringDateName(){
     let date = new Date();
     let year = date.getFullYear();
-    let month = ('0'+date.getMonth()+1).slice(-2);
+    let month = ('0'+String(parseInt(date.getMonth())+1)).slice(-2);
     let day = ('0'+date.getDate()).slice(-2);
     let time = date.toLocaleString('en-US', {hour12: false});
     let hours = time.slice(-8,-6);

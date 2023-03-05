@@ -1,37 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Layout from '../context/Layout';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import audi from '../sounds/beep-07a.mp3';
+import { funcAuth_loadData } from '../context/Functions_Auth';
 
 
 function Home() {
 
-  const {reference} = useAuth();
-
-  const handleAudio = ()=>{
-    const audio = new Audio(audi);
-    audio.play();
-
-  }
+  const { reference } = useAuth();
 
   
+  useEffect(()=>{
+    try{
+      let callback = (data) => {
+        const elem = reference.current.querySelector('#Home_insertHTML');
+        elem.innerHTML = data.news ?? '';
+      }; 
+      funcAuth_loadData('/NewForEveryone',callback);
+    }catch(err){console.log('useEffect: ' + err)}
+  },[]);
+
+
   return (
     <Layout>
       <data value='/'></data>
-      <div>
-        test
-        <input onClick={()=>handleAudio()} type='button' value='Test'/>
-        <input type="text" />
-        <Link to='/request'>REQUEST</Link>
-        <input type="file" />
-        <img src="data:image/jpeg;base64,77+9E++/ve+/vXkp77+9Oe+/ve+/vVzvv73vv73vv70=" alt='test'/>
-
-        
-        
-      </div>
+      <div id="Home_insertHTML"></div>
     </Layout>
-  )
-}
+  );
+};
 
 export default Home

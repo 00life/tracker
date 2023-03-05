@@ -12,6 +12,8 @@ import Participants from './pages/Participants.js';
 import Addlist from './pages/Addlist.js';
 import Test from './pages/Test.js';
 import EditPerson from './pages/EditPerson.js';
+import R324Tracker from './pages/R324Tracker.js';
+import AutoConfig from './pages/AutoConfig.js';
 
 function App(){
 
@@ -23,7 +25,7 @@ function App(){
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Home />}/>
-          <Route exact path="/profile" element={<Profile />}/>
+          <Route exact path="/profile" element={<RequireAuth><Profile /></RequireAuth>}/>
           <Route exact path="/barcode" element={<Barcode />}/>
           <Route exact path="/login" element={<Login />}/>
           <Route exact path="/signup" element={<Signup />}/>
@@ -33,8 +35,9 @@ function App(){
           <Route exact path="/addlist" element={<Addlist />}/>
           <Route exact path="/editperson" element={<EditPerson />}/>
           <Route exact path="/request" element={<RequireAuth><Request /></RequireAuth>}/>
+          <Route exact path="/R324Tracker" element={<R324Tracker />}/>
+          <Route exact path="/autoconfig" element={<AutoConfig />}/>
           <Route exact path="/test" element={<Test />}/>
-          {/* <Route path="/" element={<Home />}/> */}
         </Routes>
       </BrowserRouter>
     </div>

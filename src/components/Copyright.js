@@ -11,28 +11,29 @@ function Copyright() {
   return (
     <div style={{display:'flex', justifyContent:'center'}}>
         <div className="copyright" style={{
-            width:'90%', 
+            width:'120%', 
             position: 'fixed', 
             bottom:'0', 
             outline: '1px solid black',
-            zIndex:'3'
+            zIndex:'3',
         }}>
 
             <div className="shareSocial" style={{
                 display: 'flex',
-                backgroundColor: 'rgba(255, 248, 220,0.5)',
+                backgroundColor: 'var(--monochromaticWhite)',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                height:'1rem',
             }}>
 
-                <a target="_blank" href={'https://www.facebook.com/sharer.php?u='+link}>
-                    <img src={require('./../images/iconFacebook.png')} style={{maxHeight:'20px', width:'auto'}} />
+                <a  rel='noopener' href={'https://www.facebook.com/sharer.php?u='+link}>
+                    <img alt='facebookIcon' src={require('./../images/iconFacebook.png')} style={{maxHeight:'15px', width:'auto', margin:'0 5px'}} />
                 </a>
                 
                 &nbsp;
 
-                <a target="_blank" href={`https://twitter.com/share?url=${link}&text=${title}&via=${via}&hashtags=${hash}`}>
-                    <img src={require('./../images/iconTwitter.png')} style={{maxHeight:'20px', width:'auto'}}/>
+                <a  rel='noopener' href={`https://twitter.com/share?url=${link}&text=${title}&via=${via}&hashtags=${hash}`}>
+                    <img alt='twitterIcon' src={require('./../images/iconTwitter.png')} style={{maxHeight:'15px', width:'auto', margin:'0 5px'}}/>
                 </a>
             
             </div>

@@ -15,7 +15,8 @@ function BarSearch(){
         e.length > 0 ? setBoolFilter(true) : setBoolFilter(false);
 
         // Activating the filter
-        let cleanLetter = e.replace(/[^\w\s]/gi, '')
+        let lowercase = e.toLowerCase();
+        let cleanLetter = lowercase.replace(/[^\w\s]/gi, '');
         let filterFirstnameArray = persons.filter(item=>item.firstname.toLowerCase().match('^'+cleanLetter));
         let filterLastnameArray = persons.filter(item=>item.lastname.toLowerCase().match('^'+cleanLetter));
         let filterFinal = [...new Set([...filterFirstnameArray,...filterLastnameArray])];
@@ -43,7 +44,7 @@ function BarSearch(){
             <div style={{backgroundColor:'var(--sec-backgroundColor)', padding:'5px', borderRadius:'5px', boxShadow:'1px 1px 4px 0px #8888', marginBottom:'5px'}}>
                 <InputBar ids='BarSearch_InputBar' placeholder="Search Name" func_onChange={handleSearch}/>
             </div>
-            <div style={{backgroundColor:'var(--main-backgroundColor)', borderRadius:'5px', boxShadow:'1px 1px 4px 0px #8888', display:'flex'}}>
+            <div style={{backgroundColor:'var(--main-backgroundColor)', borderRadius:'5px', boxShadow:'1px 1px 4px 0px #8888', display:'flex', paddingBottom:'20px'}}>
                 &nbsp;
                 {boolFilter && filterArray.map((obj,i)=>(
                     <div key={i} style={{margin:'5px'}}>

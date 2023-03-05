@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
-
 import Layout from '../context/Layout';
 import { useAuth } from '../context/AuthContext';
-
 import InputBar from '../components/inputBar';
 import ModalView from '../components/ModalView';
 import { func_modalview, func_snackbar } from '../context/Functions_1';
 import { func2_playAudio, func2_visualEffect } from '../context/Functions_2';
+import { func3_handleHashWatch } from '../context/Functions_3';
 import BarSearch from './BarSearch';
 import BarTrack from './BarTrack';
-import { async } from '@firebase/util';
+
 
 
 function Barcode() {
-  const { persons, logArray, setLogArray, outPeople, setOutPeople, backPeople, setbackPeople, config, setConfig, configuration, reference } = useAuth();
+  const { persons, logArray, setLogArray, outPeople, setOutPeople, backPeople, setBackPeople, config, setConfig, configuration, reference } = useAuth();
   const [modalSwitch, setModalSwitch] = useState('');
 
   const DEFAULT_RATELIMIT = 0;
@@ -30,11 +29,10 @@ function Barcode() {
 
       func2_playAudio('stop');
       func2_visualEffect(reference, 'rateLimitVisual', 'tomato');
-    }else{
-      func2_playAudio('go');
     };
     
   }, [reference, logArray]);
+
 
   const handleScan = () => {
     // test hash: 73e20606cb1ee1325585ae4235364c20
@@ -60,15 +58,31 @@ function Barcode() {
 
         // Tracking who is out and who came back
         if (LogNumber % 2 !== 0) {
+          
           duration = Math.round((date.getTime() - filterPerson.filter(obj => obj.number === LogNumber - 1)[0].timestamp) / 1000 / 60);
           let filterPeople = outPeople.filter(obj => obj.hash !== hash);
-          setbackPeople([...backPeople, { hash: hash, base64: person.base64, firstname: person.firstname, lastname: person.lastname, duration: duration }]);
+          setBackPeople([...backPeople, { hash: hash, base64: person.base64, firstname: person.firstname, lastname: person.lastname, duration: duration }]);
           setOutPeople([...filterPeople]);
+          
+          // Play audio back beep
+          func2_playAudio('back');
+
+          // Add hash to the watchlist when participant leaves
+          func3_handleHashWatch('leave', hash);
+
         } else {
+
           duration = '~';
           let filterPeople = backPeople.filter(obj => obj.hash !== hash);
           setOutPeople([...outPeople, { hash: hash, base64: person.base64, firstname: person.firstname, lastname: person.lastname, timestamp: date.getTime() }]);
-          setbackPeople([...filterPeople]);
+          setBackPeople([...filterPeople]);
+         
+          // Play audio go beep
+          func2_playAudio('go');
+
+          // Add hash to the watchlist when the participant arrives
+          func3_handleHashWatch('arrive', hash);
+
         };
 
         // Creating the log Array
@@ -78,7 +92,7 @@ function Barcode() {
             firstname: person.firstname,
             lastname: person.lastname,
             number: LogNumber,
-            time: date.toLocaleTimeString().slice(0, 4) + date.toLocaleTimeString().slice(-2,),
+            time: date.toLocaleTimeString().slice(0, 5) + date.toLocaleTimeString().slice(-2,),
             date: `${date.getFullYear()}/${('0' + date.getMonth() + 1).slice(-2)}/${('0' + date.getDate()).slice(-2)}`,
             timestamp: date.getTime(),
             duration: duration,
@@ -107,8 +121,22 @@ function Barcode() {
     try {
       setModalSwitch('BarSearch');
       func_modalview(reference, '#myModal');
-      setTimeout(() => { reference.current.querySelector('#BarSearch_InputBar').focus() }, 100);
+      setTimeout(() => {reference.current.querySelector('#BarSearch_InputBar').focus() }, 100);
     } catch (err) { console.log('handSearchName: ' + err) }
+  };
+
+  const handleDeleteLogEntry = e =>{
+    try{
+      let timestamp = e.currentTarget.dataset.timestamp;
+      let filterLogArray = logArray.filter(obj=>(String(obj.timestamp) !== String(timestamp)));
+      let filterBackPeople = backPeople.filter(obj=>(String(obj.timestamp) !== String(timestamp)));
+      let filterOutPeople = outPeople.filter(obj=>(String(obj.timestamp) !== String(timestamp)));
+      setLogArray([...filterLogArray]);
+      setBackPeople([...filterBackPeople]);
+      setOutPeople([...filterOutPeople]);
+    }catch(err){console.log('handleDeleteLogEntry: ' + err)}
+    
+
   };
 
   return (
@@ -150,8 +178,8 @@ function Barcode() {
 
 
           {/* Search Name Button */}
-          <button onClick={() => handleSearchName()} onMouseOver={e => e.currentTarget.style.backgroundColor = 'palegreen'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'lightgreen'}
-            style={{ cursor: 'pointer', backgroundColor: 'lightgreen', borderRadius: '5px', padding: '5px', fontSize: '15px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+          <button onClick={() => handleSearchName()} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--tetradicGreen)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'var(--analogousGreen)'}
+            style={{ cursor: 'pointer', backgroundColor: 'var(--analogousGreen)', borderRadius: '5px', padding: '5px', fontSize: '15px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
             <svg height="24" width="24"><path d="m18.45 21.025-5.3-5.325q-.725.475-1.725.775-1 .3-2.15.3-3.05 0-5.175-2.125T1.975 9.475q0-3.05 2.125-5.175t5.175-2.125q3.05 0 5.175 2.125t2.125 5.175q0 1.175-.287 2.125-.288.95-.788 1.675l5.375 5.4q.475.475.463 1.162-.013.688-.488 1.188-.5.475-1.2.475t-1.2-.475Zm-9.175-7.65q1.65 0 2.775-1.113 1.125-1.112 1.125-2.787 0-1.65-1.125-2.775T9.275 5.575Q7.6 5.575 6.488 6.7 5.375 7.825 5.375 9.475q0 1.675 1.113 2.787 1.112 1.113 2.787 1.113Z" /></svg>
             Name
           </button>
@@ -167,10 +195,10 @@ function Barcode() {
 
         <div style={{ display: 'flex', flexDirection: 'column-reverse', flexWrap:'wrap'}}>
           {logArray.map((obj, i) => (
-            <div key={i} style={{ boxShadow: '1px 1px 4px 0px #8888', margin: '2px 5px', borderRadius: '5px', backgroundColor: (i % 2 === 0) ? 'var(--thir-backgroundColor)' : 'var(--main-backgroundColor)' }}>
+            <div key={i} style={{ boxShadow: '1px 1px 4px 0px #8888', margin: '2px 5px', borderRadius: '5px', backgroundColor: (i % 2 === 0) ? 'var(--monochromaticWhite)' : 'var(--main-backgroundColor)' }}>
 
               {obj.number % 2 === 0
-                ? <span style={{ color: 'green', fontSize: '20px' }}>»</span>
+                ? <span style={{ color: 'black', fontSize: '20px' }}>»</span>
                 : <span style={{ color: 'blue', fontSize: '20px' }}>«</span>
               }
 
@@ -190,7 +218,9 @@ function Barcode() {
               <span>{obj.date}</span>
               <span>&nbsp;::&nbsp;</span>
               <span>{obj.lastname}&nbsp;{obj.firstname}</span>
-              <span>&nbsp;::&nbsp;</span>
+              <span style={{float:'right', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                <svg data-timestamp={obj.timestamp} onClick={(e)=>handleDeleteLogEntry(e)} height="24" width="24"><path d="M7.2 21.3q-1.05 0-1.75-.7t-.7-1.75V5.9h-1V3.75h5.2V2.675h6.15V3.75h5.2V5.9h-1v12.95q0 1.025-.713 1.737-.712.713-1.737.713Zm9.95-15.4H6.9v12.95q0 .125.088.212.087.088.212.088h9.65q.1 0 .2-.1t.1-.2ZM8.875 17.125h2.15v-9.2h-2.15Zm4.15 0h2.15v-9.2h-2.15ZM6.9 5.9V19.15v-.3Z"/></svg>
+              </span>
 
             </div>
           ))}
