@@ -177,8 +177,10 @@ function Profile() {//fix
       let profileObj = {
         firstname: firstname !=='' ? firstname : profileData.firstname,
         lastname: lastname !=='' ? lastname : profileData.lastname,
+        uid: auth.currentUser.uid,
         email: email === '' ? auth.currentUser.email : funcAuth_updateEmail(email),
         schedule: onSchedule !==[] ? onSchedule : profileData.schedule,
+        contactList: profileData.contactList ?? [],
         base64: profileData.base64,
         
       };

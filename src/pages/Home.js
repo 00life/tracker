@@ -6,18 +6,17 @@ import { funcAuth_loadData } from '../context/Functions_Auth';
 
 function Home() {
 
-  const { reference } = useAuth();
+  const {reference } = useAuth();
 
-  
   useEffect(()=>{
-    try{
+    try {
       let callback = (data) => {
         const elem = reference.current.querySelector('#Home_insertHTML');
         elem.innerHTML = data.news ?? '';
-      }; 
-      funcAuth_loadData('/NewForEveryone',callback);
-    }catch(err){console.log('useEffect: ' + err)}
-  },[]);
+      };
+      funcAuth_loadData('/NewForEveryone', callback);
+    } catch (err) { console.log('useEffect: ' + err) }
+  },[reference]);
 
 
   return (

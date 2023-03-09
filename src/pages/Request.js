@@ -10,7 +10,8 @@ import { func_modalview } from '../context/Functions_1';
 import RequestOptions from './RequestOptions';
 import ReceivingParticipant from '../components/ReceivingParticipant';
 import SentParticipant from '../components/SentParticipant';
-// import LogParticipant from '../components/LogParticipant';
+import TakeReceivingParticipant from '../components/TakeSentParticipant';
+import TakeSentParticipant from '../components/TakeReceiveParticipant';
 
 
 function Request() {
@@ -35,7 +36,7 @@ function Request() {
         if(e.currentTarget.checked){
           let callback = data =>{
             resolve(data);
-          };;
+          } ;; // Callback Host
           funcAuth_loadKeyData('/users', callback);
         };
       });
@@ -51,7 +52,7 @@ function Request() {
             let callback2 = data2 => {
               let mydata = (data2 === undefined||data2 === null||data2 === '') ? '' : data2;
               uidEmailArray.push({email:mydata.join(''), uid:data[i]});
-            };;
+            } ;; // Callback2 Host
             funcAuth_loadValData(path, callback2)
           };
           // return the results
@@ -151,13 +152,12 @@ function Request() {
 
       // Sorting the data into respective Arrays
       data.forEach(obj=>{
-        if(obj.type === 'receive'){
+        if(obj.type === 'receive' || obj.type === 'sent' || obj.type === 'take_sent' || obj.type === 'take_receive'){
           allReqArray.push(obj);
         }else if(obj.type === 'confirm'){
           confirmReqArray.push(obj)
-        }else if(obj.type === 'sent'){
-          allReqArray.push(obj)
         };
+
       });
       setAllRequests([...allReqArray]);
       setAllConfirms([...confirmReqArray]);
@@ -238,6 +238,7 @@ function Request() {
             <hr/>
 
             {/* List of Saved Contacts */}
+            
             {profileData.contactList.map((obj,i)=>(
               
               <div key={i}>
@@ -278,9 +279,13 @@ function Request() {
                   <SentParticipant firstname={obj.firstname} lastname={obj.lastname} timestamp={obj.timestamp} confirm={allConfirms} arriveTime={obj.arriveTime} leaveTime={obj.leaveTime} receiverName={obj.receiverName} />
                 }
 
-                {/* {auth.currentUser.uid !== obj.sender && obj.type === 'log' &&
-                  <LogParticipant firstname={obj.firstname} lastname={obj.lastname} timestamp={obj.timestamp} time={obj.time} date={obj.date}/>
-                } */}
+                {auth.currentUser.uid === obj.sender && obj.type === 'take_sent' &&
+                  <TakeSentParticipant firstname={obj.firstname} lastname={obj.lastname} timestamp={obj.timestamp} confirm={allConfirms} arriveTime={obj.arriveTime} leaveTime={obj.leaveTime}/>
+                }
+
+                {auth.currentUser.uid !== obj.sender && obj.type === 'take_receive' &&
+                  <TakeReceivingParticipant firstname={obj.firstname} lastname={obj.lastname} timestamp={obj.timestamp} confirm={allConfirms} arriveTime={obj.arriveTime} leaveTime={obj.leaveTime}/>
+                }
                 
               </div>
             ))}

@@ -1,5 +1,7 @@
 import { auth } from "./Firebase";
-import { funcAuth_loadValData, funcAuth_setData, funcAuth_updateData } from "./Functions_Auth";
+import { funcAuth_loadValData, funcAuth_setData } from "./Functions_Auth";
+import preval from 'babel-plugin-preval/macro';
+
 
 export function func3_stripStoragePersons(persons){
     

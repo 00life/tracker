@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { auth } from "../context/Firebase";
 import { funcAuth_updateData, funcAuth_loadValData, funcAuth_setData } from "../context/Functions_Auth";
 
-function ReceivingParticipant({firstname, lastname, timestamp, sender, confirm, hash, schedule, email, base64, arriveTime, leaveTime, senderName}){
+function TakeReceivingParticipant({firstname, lastname, timestamp, sender, confirm, hash, schedule, email, base64, arriveTime, leaveTime, senderName}){
     const { reference, persons, setPersons } = useAuth();
 
     const handleConfirming = e => {  
@@ -97,7 +97,7 @@ function ReceivingParticipant({firstname, lastname, timestamp, sender, confirm, 
 
             {/* Type of Request and confirmation */}
             <span onClick={e=>handleConfirming(e)} style={{border:'1px solid #8888', borderRadius:'5px', padding:'2px 5px', backgroundColor:'var(--analogousBlue)', cursor:'pointer'}}>
-                Receive <span id={'checkspan_'+timestamp}>&#x10102;</span>
+                Sent <span id={'checkspan_'+timestamp}>&#x10102;</span>
             </span>
 
             <span>&nbsp;::&nbsp;</span>
@@ -127,7 +127,7 @@ function ReceivingParticipant({firstname, lastname, timestamp, sender, confirm, 
 
             <span>&nbsp;::&nbsp;</span>
 
-            <h3 style={{color:'var(--main-textColor)'}}>send</h3>
+            <h3 style={{color:'var(--main-textColor)'}}>Take</h3>
             
             {/* Spacer to seperate items */}
             <div style={{flexGrow:1}}>&nbsp;</div>
@@ -141,4 +141,4 @@ function ReceivingParticipant({firstname, lastname, timestamp, sender, confirm, 
     );
 };
 
-export default ReceivingParticipant;
+export default TakeReceivingParticipant;

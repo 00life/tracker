@@ -217,13 +217,13 @@ function EditPerson() {
 
             {/* Save Button */}
             <div onClick={()=>handleSavePerson()} onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--tetradicGreen)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--analogousGreen)'}
-              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--analogousGreen)', cursor:'default', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
+              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--analogousGreen)', cursor:'pointer', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
               <h4 className="textDesign1" style={{ margin:'auto', color:'var(--sec-backgroundColor)', fontSize:'20px'}}>Save</h4>
             </div>
 
             {/* Delete Button */}
             <div onClick={()=>handleDeletePerson()} onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--complimentRed)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--triadicRed)'}
-              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--triadicRed)', cursor:'default', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
+              style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--triadicRed)', cursor:'pointer', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'50%'}}>
               <h4 className="textDesign1" style={{ margin:'auto', color:'var(--sec-backgroundColor)', fontSize:'20px'}}>Delete</h4>
             </div>
 

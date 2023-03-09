@@ -38,12 +38,12 @@ function SentParticipant({firstname, lastname, timestamp, confirm, arriveTime, l
 
         if(confirmArray[0].ans === true){
             // Put a checkmark on the html
-            reference.current.querySelector('.checkspan').innerHTML = '&#x2611;';
-            reference.current.querySelector('.checkspan').parentNode.style.backgroundColor = 'var(--tetradicGreen)';
+            reference.current.querySelector('#checkspan_'+timestamp).innerHTML = '&#x2611;';
+            reference.current.querySelector('#checkspan_'+timestamp).parentNode.style.backgroundColor = 'var(--tetradicGreen)';
         }else{
             // Put a x on the html
-            reference.current.querySelector('.checkspan').innerHTML = '&#x2612;';
-            reference.current.querySelector('.checkspan').parentNode.style.backgroundColor = 'var(--complimentRed)';
+            reference.current.querySelector('#checkspan_'+timestamp).innerHTML = '&#x2612;';
+            reference.current.querySelector('#checkspan_'+timestamp).parentNode.style.backgroundColor = 'var(--complimentRed)';
         };
         
     },[confirm.length])
@@ -54,7 +54,7 @@ function SentParticipant({firstname, lastname, timestamp, confirm, arriveTime, l
 
             {/* Type of Request and confirmation */}
             <span style={{border:'1px solid #8888', borderRadius:'5px', padding:'2px 5px', backgroundColor:'var(--columbianBlue)'}}>
-                Sent <span className='checkspan'>&#x10102;</span>
+                Sent <span id={'checkspan_'+timestamp}>&#x10102;</span>
             </span>
 
             <span>&nbsp;::&nbsp;</span>
@@ -69,18 +69,20 @@ function SentParticipant({firstname, lastname, timestamp, confirm, arriveTime, l
             <span>&nbsp;::&nbsp;</span>
 
             {/* Time that the request was made */}
-            <span>{('0' + new Date(timestamp).toLocaleTimeString()).slice(0,5)}</span>
-            <span>{('0' + new Date(timestamp).toLocaleTimeString()).slice(-2,)}</span>
+            <span>{(new Date(timestamp).toLocaleTimeString()).slice(0,-6)}</span>
+            <span>{(new Date(timestamp).toLocaleTimeString()).slice(-2,)}</span>
 
             <span>&nbsp;::&nbsp;</span>
 
             {/* Time that the Participant arrived */}
             <span>»&nbsp;{arriveTime}&nbsp; </span>
 
-            <span>&nbsp;::&nbsp;</span>
-
             {/* Time that the Participant left */}
             <span style={{color:'var(--selectBlue)'}}>«&nbsp;{leaveTime}&nbsp; </span>
+
+            <span>&nbsp;::&nbsp;</span>
+            
+            <h3 style={{color:'var(--main-textColor)'}}>send</h3>
             
             {/* Spacer to seperate items */}
             <div style={{flexGrow:1}}>&nbsp;</div>

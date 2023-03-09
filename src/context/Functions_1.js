@@ -46,7 +46,7 @@ export function func_savedata(data, name, path, reference){
       anchor.click();
       URL.revokeObjectURL(href_link);
   
-    }; 
+    };
     func_saveObjLocalStorage('config', {saveName:name}) //fix
     return false
   
@@ -71,10 +71,10 @@ export function func_loaddata(path, callback, reference){
 
       let uid = auth.currentUser.uid;
       let path_online = `users/${uid}${path}`;
-      let pullout = data => {
+      let callback2 = data => {
         callback(data)
-      }; 
-      funcAuth_loadData(path_online, pullout)
+      } ;; // Callback2 Host
+      funcAuth_loadData(path_online, callback2)
 
     // If the answer is no, it will load from your computer
     }else{

@@ -113,7 +113,51 @@ function RequestOptions(){
         }catch(err){console.log('handleRequestSend: ' + err)}
     };
 
+    const handleRequestTake = () =>{
+        let uid = reference.current.querySelector('#requestOptions_rename').dataset.uid;
+        let elemParticipantArray = reference.current.querySelectorAll('.requestOptionsCheckbox');
 
+        // Getting the element containing uid of the contact
+        let elem = reference.current.querySelector('#requestOptions_rename');
+        // Getting the element that contains the contactName
+        let objContact = profileData.contactList.filter(obj=>(obj.uid === elem.dataset.uid))[0];
+
+        // Create a hashArray if the participant is selected
+        let hashArray = [];
+        elemParticipantArray.forEach(elem=>{
+            if(elem.checked){hashArray.push(elem.id.slice(8,))}
+        });
+
+        // Guard-Clause if hashArray is empty
+        if(hashArray.length===0){return};
+
+        // Create an array of selected person objects
+        let recipientArray = [];
+        let senderArray = [];
+        hashArray.forEach(hash=>{
+            let filterPerson = persons.filter(obj=>obj.hash === hash)[0];
+            let dateNow = new Date().getTime();
+            
+            let recipientObj = {...filterPerson, type: 'take_receive', timestamp: dateNow, sender: auth.currentUser.uid, arriveTime: '~', leaveTime: '~', senderName: auth.currentUser.displayName};
+            let senderObj = {...filterPerson, type: 'take_sent', timestamp: dateNow, sender: auth.currentUser.uid, arriveTime: '~', leaveTime: '~', receiverName: objContact.contactName};
+            
+            recipientArray.push(recipientObj);
+            senderArray.push(senderObj);
+        });
+
+        // Send object recipient and sender in Firebase
+        recipientArray.forEach(obj=>{funcAuth_updateData(`/users/${uid}/requests`, obj)});
+        senderArray.forEach(obj=>{funcAuth_updateData(`/users/${auth.currentUser.uid}/requests`, obj)});
+        
+        // Clear inputs and checkboxes and searchResults
+        elemParticipantArray.forEach(elem=>{if(elem.checked){elem.click()}});
+        reference.current.querySelector('#requestOptions_search').value = '';
+        setSearchResults([]);
+        reference.current.querySelector('.close').click();
+
+    };
+
+    
     return (
         <div>
             <div style={{display:'flex', boxShadow:"1px 1px 4px 0px #8888", justifyContent:'center', borderRadius:'5px', alignItems:'center', width:'100%'}}>
@@ -151,7 +195,7 @@ function RequestOptions(){
                 </div>
 
                 {/* Request Take Button */}
-                <div onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--analogousBlue)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--columbianBlue)'}
+                <div onMouseOver={e=>e.currentTarget.style.backgroundColor='var(--analogousBlue)'} onMouseOut={e=>e.currentTarget.style.backgroundColor='var(--columbianBlue)'} onClick={()=>handleRequestTake()}
                     style={{padding:'5px', boxShadow:"1px 1px 4px 0px #8888", marginRight:'5px', borderRadius:'5px', border:'2px solid black', backgroundColor:'var(--columbianBlue)', cursor:'pointer', display:'flex', flexWrap:'nowrap', marginBottom:'10px', width:'10rem', marginTop:'10px'}}>
                     <h4 className="textDesign1" style={{ margin:'auto', color:'var(--sec-backgroundColor)', fontSize:'15px'}}>Take</h4>
                 </div>
