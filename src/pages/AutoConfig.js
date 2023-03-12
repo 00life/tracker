@@ -17,64 +17,71 @@ function AutoConfig(){
 
 
     const handleSaveAutoConfig = () => {
+        try{
+            // Elements of the Toggle Buttons
+            let elem_participantsWin = reference.current.querySelector('#checkparticipantsWin');
+            let elem_profileWin = reference.current.querySelector('#checkprofileWin');
+            let elem_logWin = reference.current.querySelector('#checklogWin');
 
-        // Elements of the Toggle Buttons
-        let elem_participantsWin = reference.current.querySelector('#checkparticipantsWin');
-        let elem_profileWin = reference.current.querySelector('#checkprofileWin');
-        let elem_logWin = reference.current.querySelector('#checklogWin');
+            let elem_participantsLin = reference.current.querySelector('#checkparticipantsLin');
+            let elem_profileLin = reference.current.querySelector('#checkprofileLin');
+            let elem_logLin = reference.current.querySelector('#checklogLin');
+            
+            // Create object with the toggle button current state
+            let objAutoConfig = {
 
-        let elem_participantsLin = reference.current.querySelector('#checkparticipantsLin');
-        let elem_profileLin = reference.current.querySelector('#checkprofileLin');
-        let elem_logLin = reference.current.querySelector('#checklogLin');
-        
-        // Create object with the toggle button current state
-        let objAutoConfig = {
+                participantsWin: elem_participantsWin.checked,
+                profileWin: elem_profileWin.checked,
+                logWin: elem_logWin.checked,
 
-            participantsWin: elem_participantsWin.checked,
-            profileWin: elem_profileWin.checked,
-            logWin: elem_logWin.checked,
+                participantsLin: elem_participantsLin.checked,
+                profileLin: elem_profileLin.checked,
+                logLin: elem_logLin.checked,
+            };
 
-            participantsLin: elem_participantsLin.checked,
-            profileLin: elem_profileLin.checked,
-            logLin: elem_logLin.checked,
-        };
+            // Save the object to localStorage
+            window.localStorage.setItem('autoconfig', JSON.stringify(objAutoConfig));
 
-        // Save the object into autoconfig.txt
-        var string_data = JSON.stringify(objAutoConfig);
-        var file = new File([string_data],{type:'text/csv;charset=utf-8'});
-        let href_link = window.URL.createObjectURL(file);
-        var anchor = window.document.createElement('a');
-        anchor.setAttribute('href', href_link);
-        anchor.setAttribute('download', 'autoconfig.txt')
-        anchor.click();
-        URL.revokeObjectURL(href_link);
+            // Save the object into autoconfig.txt
+            var string_data = JSON.stringify(objAutoConfig);
+            var file = new File([string_data],{type:'text/csv;charset=utf-8'});
+            let href_link = window.URL.createObjectURL(file);
+            var anchor = window.document.createElement('a');
+            anchor.setAttribute('href', href_link);
+            anchor.setAttribute('download', 'autoconfig.txt')
+            anchor.click();
+            URL.revokeObjectURL(href_link);
+
+        }catch(err){console.log('handleSaveAutoConfig: ' + err)}
     };
 
     const handleToggleConf = e => {
-        if(e.currentTarget.id==='checkparticipantsWin'){
-            setConfiguration({...configuration, participantsWin: e.currentTarget.checked})
-        }else if(e.currentTarget.id==='checkprofileWin'){
-            setConfiguration({...configuration, profileWin: e.currentTarget.checked})
-        }else if(e.currentTarget.id==='checklogWin'){
-            setConfiguration({...configuration, logWin: e.currentTarget.checked})
-        }else if(e.currentTarget.id==='checkparticipantLin'){
-            setConfiguration({...configuration, participantsLin: e.currentTarget.checked})
-        }else if(e.currentTarget.id==='checkprofileLin'){
-            setConfiguration({...configuration, profileLin: e.currentTarget.checked})
-        }else if(e.currentTarget.id==='checklogLin'){
-            setConfiguration({...configuration, logLin: e.currentTarget.checked})
-        };
+        try{
+            if(e.currentTarget.id==='checkparticipantsWin'){
+                setConfiguration({...configuration, participantsWin: e.currentTarget.checked})
+            }else if(e.currentTarget.id==='checkprofileWin'){
+                setConfiguration({...configuration, profileWin: e.currentTarget.checked})
+            }else if(e.currentTarget.id==='checklogWin'){
+                setConfiguration({...configuration, logWin: e.currentTarget.checked})
+            }else if(e.currentTarget.id==='checkparticipantLin'){
+                setConfiguration({...configuration, participantsLin: e.currentTarget.checked})
+            }else if(e.currentTarget.id==='checkprofileLin'){
+                setConfiguration({...configuration, profileLin: e.currentTarget.checked})
+            }else if(e.currentTarget.id==='checklogLin'){
+                setConfiguration({...configuration, logLin: e.currentTarget.checked})
+            };
+        }catch(err){console.log('handleToggleConf: ' + err)}
     };
 
 
     useEffect(()=>{
-        //Window Computers
+        // Checkboxes Window Computers 
         let trackerR324Win = preval`const fs = require('fs'); module.exports = fs.existsSync('C:/trackerR324/autoconfig.txt', 'utf8');`;
         let participantsWin = preval`const fs = require('fs'); module.exports = fs.existsSync('C:/trackerR324/participants.txt', 'utf8');`;
         let profileWin = preval`const fs = require('fs'); module.exports = fs.existsSync('C:/trackerR324/profile.json', 'utf8');`;
         let logWin = preval`const fs = require('fs'); module.exports = fs.existsSync('C:/trackerR324/log.txt', 'utf8');`;
         
-        // Linux Computers
+        // Checkboxes Linux Computers
         let trackerR324Lin = preval`const fs = require('fs'); module.exports = fs.existsSync('/home/trackerR324/autoconfig.txt', 'utf8');`;
         let participantsLin = preval`const fs = require('fs'); module.exports = fs.existsSync('/home/trackerR324/participants.txt', 'utf8');`;
         let profileLin = preval`const fs = require('fs'); module.exports = fs.existsSync('/home/trackerR324/profile.json', 'utf8');`;
@@ -86,15 +93,26 @@ function AutoConfig(){
             dirLin: trackerR324Lin, participantsLin:participantsLin, profileLin: profileLin, logLin:logLin,
         });
         
-        // Loading the toggle settings
-        reference.current.querySelector('#checkparticipantsWin').checked = configuration.participantsWin;
-        reference.current.querySelector('#checkprofileWin').checked = configuration.profileWin;
-        reference.current.querySelector('#checklogWin').checked = configuration.logWin;
+        let autoconfigLS = JSON?.parse(window.localStorage.getItem('autoconfig'));
+        if(autoconfigLS!==undefined||autoconfigLS!==null){
+            // Loading the toggle settings from localStorage
+            reference.current.querySelector('#checkparticipantsWin').checked = autoconfigLS.participantsWin;
+            reference.current.querySelector('#checkprofileWin').checked = autoconfigLS.profileWin;
+            reference.current.querySelector('#checklogWin').checked = autoconfigLS.logWin;
 
-        reference.current.querySelector('#checkparticipantsLin').checked = configuration.participantsLin;
-        reference.current.querySelector('#checkprofileLin').checked = configuration.profileLin;
-        reference.current.querySelector('#checklogLin').checked = configuration.logLin;
+            reference.current.querySelector('#checkparticipantsLin').checked = autoconfigLS.participantsLin;
+            reference.current.querySelector('#checkprofileLin').checked = autoconfigLS.profileLin;
+            reference.current.querySelector('#checklogLin').checked = autoconfigLS.logLin;
+        }else{
+            // Loading the toggle settings from autoconfig.txt
+            reference.current.querySelector('#checkparticipantsWin').checked = configuration.participantsWin;
+            reference.current.querySelector('#checkprofileWin').checked = configuration.profileWin;
+            reference.current.querySelector('#checklogWin').checked = configuration.logWin;
 
+            reference.current.querySelector('#checkparticipantsLin').checked = configuration.participantsLin;
+            reference.current.querySelector('#checkprofileLin').checked = configuration.profileLin;
+            reference.current.querySelector('#checklogLin').checked = configuration.logLin;
+        };
     },[]);
 
     return (
@@ -104,7 +122,6 @@ function AutoConfig(){
             
                 {/* Title */}
                 <h3 className="textDesign1" style={{ marginLeft:'10px', fontSize:'23px'}}>AutoConfig: Offline-Automate</h3>
-                <h4 style={{ marginLeft:'10px', fontSize:'20px', color:'var(--main-textColor)'}}>(Autoload on Homepage Visit)</h4>
                 
                  <br/> {/*========= Windows Computers ==================== */}
 

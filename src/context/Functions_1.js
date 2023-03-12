@@ -12,7 +12,6 @@ export function func_snackbar(reference, message) {
   }catch(err){console.log('func_snackbar:'+err)}
 };
 
-
 export function func_savedata(data, name, path, reference){
   // Saves data online or on your computer (must provide name);
   try{
@@ -83,7 +82,7 @@ export function func_loaddata(path, callback, reference){
       elem_input.setAttribute('type', 'file');
       elem_input.click();
       elem_input.onchange = function(e){
-        var file = e.files[0];
+        var file = e.currentTarget.files[0];
         var reader = new FileReader();
         reader.onloadend = function(){
           var load = JSON.parse(reader.result);
@@ -198,24 +197,24 @@ export function func_blobToDataURI(blob, callback){
 };
 
 
-export function func_dataURItoBlob(dataURI) {
-  // convert base64 to raw binary data held in a string
-  var byteString = atob(dataURI.split(',')[1]);
+// export function func_dataURItoBlob(dataURI) {
+//   // convert base64 to raw binary data held in a string
+//   var byteString = atob(dataURI.split(',')[1]);
 
-  // separate out the mime component
-  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+//   // separate out the mime component
+//   var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
-  // write the bytes of the string to an ArrayBuffer
-  var arrayBuffer = new ArrayBuffer(byteString.length);
-  var _ia = new Uint8Array(arrayBuffer);
-  for (var i = 0; i < byteString.length; i++) {
-      _ia[i] = byteString.charCodeAt(i);
-  }
+//   // write the bytes of the string to an ArrayBuffer
+//   var arrayBuffer = new ArrayBuffer(byteString.length);
+//   var _ia = new Uint8Array(arrayBuffer);
+//   for (var i = 0; i < byteString.length; i++) {
+//       _ia[i] = byteString.charCodeAt(i);
+//   }
 
-  var dataView = new DataView(arrayBuffer);
-  var blob = new Blob([dataView], { type: mimeString });
-  return blob;
-};
+//   var dataView = new DataView(arrayBuffer);
+//   var blob = new Blob([dataView], { type: mimeString });
+//   return blob;
+// };
 
 
 export function func_saveObjLocalStorage(storageName='config', obj){

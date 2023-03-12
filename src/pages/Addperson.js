@@ -57,7 +57,7 @@ function Addperson() {
     }
   };
 
-  const handleAddPerson=e=>{
+  const handleAddPerson = e => {
     e.preventDefault();
     try{
       // Ensuring that all hashes are unique for each person
@@ -122,14 +122,14 @@ function Addperson() {
     }catch(err){console.log('handleSchedule:'+err)}
   };
 
-  const handleParticipants=()=>{
-    try{
-      let current = reference?.current?.querySelectorAll('data')[0].value;
-      let last = sessionStorage.getItem('lastpage');
-      if(last!==current){sessionStorage.setItem('lastpage',current)};
-      navigate('/participants');
-    }catch(err){console.log('handleParticipants:'+err)}
-  };
+  // const handleParticipants=()=>{
+  //   try{
+  //     let current = reference?.current?.querySelectorAll('data')[0].value;
+  //     let last = sessionStorage.getItem('lastpage');
+  //     if(last!==current){sessionStorage.setItem('lastpage',current)};
+  //     navigate('/participants');
+  //   }catch(err){console.log('handleParticipants:'+err)}
+  // };
 
   const handleUploadPicture = e => {
     // Recieve user input and guard-clause
@@ -158,7 +158,7 @@ function Addperson() {
             // Set the variable to the base64 data
             setBase64Img(data);
             
-          };
+          } ;; // Callback Host
           func_stringBase64File(e.target, callback);
         };
 
@@ -181,8 +181,7 @@ function Addperson() {
             // Notification that the image is too large
             func_snackbar(reference,`Upload must be < ${MAX_SIZE_KB/1000} MB`)
           };
-        };
-        // Converts the URL image into base64 data
+        } ;; // Callback Host
         func2_toDataURL(httpLink, callback);
       };
       
@@ -193,20 +192,22 @@ function Addperson() {
   };
 
   const handleDeleteDetailSchedule = e =>{
-    // Getting the index on the item on the schedule list
-    let dataIndex = e.currentTarget.dataset.index;
-    
-    // Getting the item's creation timestamp
-    let date = scheduleArray[dataIndex].date;
+    try{
+      // Getting the index on the item on the schedule list
+      let dataIndex = e.currentTarget.dataset.index;
+      
+      // Getting the item's creation timestamp
+      let date = scheduleArray[dataIndex].date;
 
-    // Filtering out the current creating timestamp
-    let filterArraySchedule = scheduleArray.filter(obj => obj.date !== date);
-    
-    // Setting new array with the filtered array
-    setScheduleArray(filterArraySchedule);
+      // Filtering out the current creating timestamp
+      let filterArraySchedule = scheduleArray.filter(obj => obj.date !== date);
+      
+      // Setting new array with the filtered array
+      setScheduleArray(filterArraySchedule);
 
-    // confirmation message
-    func_snackbar(reference, 'Schedule Updated')
+      // confirmation message
+      func_snackbar(reference, 'Schedule Updated')
+    }catch(err){console.log('handleDeleteDetailSchedule: ' + err)}
   };
 
   return (

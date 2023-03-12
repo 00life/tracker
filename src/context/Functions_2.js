@@ -1,42 +1,48 @@
-import { func_dataURItoBlob } from "./Functions_1";
+// import { func_dataURItoBlob } from "./Functions_1";
+import { auth } from "./Firebase";
+import { funcAuth_loadData } from "./Functions_Auth";
 import beepGo from '../sounds/beep-07a.mp3';
 import beepStop from '../sounds/beep-10.mp3';
 import beepBack from '../sounds/beep-08b.mp3';
 
 
-export function func_config(setConfig){
+export function func2_config(configuration, setConfiguration){
 // Load the autoload toggle button to its previous settings
     try{
-        let autoConfig = JSON.parse(window?.localStorage?.getItem('config'));  
-        setConfig({...autoConfig, auto:!autoConfig.auto});
+        let autoConfig = JSON.parse(window?.localStorage?.getItem('config'));
+        setConfiguration({...configuration, onlineLoadParticipant:!autoConfig.onlineLoadParticipant});
+        return autoConfig
     }catch(err){console.log('func_config:'+err)};
 };
 
-
-export function func2_autoLoadPersons(persons, setPersons, func_snackbar, reference){
-// Load persons at startup from file location
+export function func2_autoLoadPersons(persons, setPersons){
+    let autoConfig = JSON.parse(window?.localStorage?.getItem('config'));
+    let TRIES = 10;
     try{
-        let autoConfig = JSON.parse(window?.localStorage?.getItem('config'));
-        if(persons.length === 0 && !autoConfig.auto){
-            let blob = func_dataURItoBlob(autoConfig.persons);
-            
-            var reader = new FileReader();
-            reader.onloadend = function(){
-                var load = JSON.parse(reader.result);
-                setPersons(load);
-            };
-            reader.readAsText(blob);
-        };
-    }catch(err){
-        func_snackbar(reference,'Load at least once to set autoload')
-        console.log('func_autoLoadPersons:'+err)
-    }
+        // Guard-Clause if the toggle is turned off (NOTE: true/false is backwards)
+        if(autoConfig.onlineLoadParticipant){return}
 
-    // try{
-    //     let localStoragePersons = JSON.parse(window?.localStorage?.getItem('persons'));
-    //     setPersons([...localStoragePersons]);
-    //     func_snackbar(reference,'Autoload from memory')
-    // }catch(err){console.log('func2_autoLoadPersons: ' + err)}
+        let count = 0;
+
+        // Check if you have auth access to firebase
+        let callback = uid => {
+            count++;
+            if(uid){
+                clearInterval(interval);
+                
+                // Load the data from firebase if data is not null
+                let callback2 = data2 =>{
+                    if(data2!==null){setPersons([...persons, ...data2])};
+                } ;; // Callback2 Host
+                funcAuth_loadData(`/users/${uid}/participants`, callback2);
+
+            // Gives up after TRIES
+            }else if(count > TRIES){return}
+
+        } ;; // Callback Host
+        let interval = setInterval(()=>callback(auth.currentUser.uid),1000);
+        
+    }catch(err){console.log('func2_autoLoadPersons: ' + err)}
 };
 
 export function func2_toDataURL(src, callback){

@@ -238,17 +238,14 @@ function Request() {
             <hr/>
 
             {/* List of Saved Contacts */}
-            
             {profileData.contactList.map((obj,i)=>(
-              
+
               <div key={i}>
               
-                {auth.currentUser.uid !== obj.uid && 
                   <div data-uid={obj.uid} onClick={e=>handleContactOptions(e)}
                     style={{border:'1px solid #8888', borderRadius:'5px', margin:'2px', overflow:'clip', cursor:'pointer',padding:'7px', backgroundColor: (i%2===0)?'':'var(--thir-backgroundColor)'}}>
                     {obj.contactName}
                   </div>
-                }
               
               </div>
               

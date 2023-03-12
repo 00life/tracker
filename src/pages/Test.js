@@ -45,7 +45,11 @@ function Test() {
   };
 
   const handleClick4 =()=>{
-   console.log(auth.currentUser)
+    console.log('test')
+    preval`
+      const fs = require('fs');
+      fs.appendFileSync(require.resolve('./test.txt'),'This is another test man!' ,'utf8');
+    `
   };
 
   return(

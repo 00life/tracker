@@ -12,7 +12,7 @@ import BarTrack from './BarTrack';
 
 
 function Barcode() {
-  const { persons, logArray, setLogArray, outPeople, setOutPeople, backPeople, setBackPeople, config, setConfig, configuration, reference } = useAuth();
+  const { persons, logArray, setLogArray, outPeople, setOutPeople, backPeople, setBackPeople, configuration, setConfiguration, reference } = useAuth();
   const [modalSwitch, setModalSwitch] = useState('');
 
   const DEFAULT_RATELIMIT = 0;
@@ -20,7 +20,7 @@ function Barcode() {
 
   useEffect(() => {
     // Setting the inputbar to focus and the configurations
-    setConfig({ ...config, rateLimit: DEFAULT_RATELIMIT, timeLimit: DEFAULT_TIMELIMIT });
+    setConfiguration({ ...configuration, rateLimit: DEFAULT_RATELIMIT, timeLimit: DEFAULT_TIMELIMIT });
     reference.current.querySelector('#scanInput').focus();
 
     if(configuration.rateLimit !==0 && outPeople.length > configuration.rateLimit){
@@ -204,9 +204,9 @@ function Barcode() {
 
               <span>&nbsp;</span>
 
-              <span style={config.timeLimit === 0
+              <span style={configuration.timeLimit === 0
                 ? { color: 'none' }
-                : obj.duration > config.timeLimit
+                : obj.duration > configuration.timeLimit
                   ? { color: 'red', fontWeight: 'bold' }
                   : { color: 'none' }}>
                 {obj.duration}

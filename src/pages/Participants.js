@@ -10,20 +10,21 @@ import Avatar from '../components/Avatar';
 import PartProfile from './PartProfile';
 import InputBar from '../components/inputBar';
 
+
 function Participants() {
 
   const navigate = useNavigate();
-  const { persons, setPersons, config, setConfig , reference } = useAuth();
+  const { persons, setPersons, configuration, setConfiguration, reference } = useAuth();
 
   const [filterArray, setFilterArray] = useState(undefined);
 
-  // fix
+
   const func_onToggle = e => {
-    setConfig(prev=>({...prev, auto:!config.auto}));
-    window.localStorage.setItem('config',JSON.stringify(config));
+    setConfiguration({...configuration, onlineLoadParticipant: e.currentTarget.checked})
+    window.localStorage.setItem('config',JSON.stringify(configuration));
     (e.currentTarget.checked)
-      ? func_snackbar(reference, 'auto is enabled')
-      : func_snackbar(reference, 'auto is disabled')
+      ? func_snackbar(reference, 'Auto-loading Online Enabled')
+      : func_snackbar(reference, 'Auto-Loading Online Disabled')
   };
 
   const handlePartProfile = async e => {
@@ -135,7 +136,7 @@ function Participants() {
               </button>
 
               <div style={{marginLeft:'5px', display:"flex", flexDirection:"column", alignItems:"center"}}>
-                <ToggleBtn func_onToggle={func_onToggle} check={config.auto}/>
+                <ToggleBtn func_onToggle={func_onToggle} check={configuration.onlineLoadParticipant}/>
                 <h6 style={{color:'var(--main-textColor:)'}}>🖧 Auto</h6>
               </div>
               

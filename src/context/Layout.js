@@ -38,8 +38,29 @@ function Layout({children}) {
     };
 
     const handleSaveLogJSON = () => {
-        let saveName = `log_${func2_stringDateName()}.json`
+        let saveName = `log_${func2_stringDateName()}.json`;
         func_savedata(logArray, saveName, '/logs', reference);
+        reference.current.querySelector('#checkbox-link').checked = false;
+        setSvgColor('');
+    };
+
+    const handleSaveLogCVS = () => {
+        let saveName = `log_${func2_stringDateName()}.csv`;
+        let string_entry = 'ACTION,DURATION,TIME,DATE,LASTNAME,FIRSTNAME\n' ;
+        logArray.forEach(obj=>{
+            let check = obj.duration !== '~' ? 'Checkin' : 'Checkout';
+            string_entry += `${check},${obj.duration},${obj.time},${obj.date},${obj.lastname},${obj.firstname}\n`;
+        });
+        let file = new File([string_entry], {type:'data:text/csv;charset=utf-8'});
+        let href_link = URL.createObjectURL(file);
+        let anchor = document.createElement('a');
+        anchor.setAttribute('href', href_link);
+        anchor.setAttribute('target','_blank');
+        anchor.setAttribute('rel','noreferrer');
+        anchor.setAttribute('download',saveName);
+        anchor.click();
+        URL.revokeObjectURL(href_link);
+
         reference.current.querySelector('#checkbox-link').checked = false;
         setSvgColor('');
     };
@@ -98,7 +119,7 @@ function Layout({children}) {
                         <td style={{width:'100%', display:'flex', alignItems:'center'}}>
                             
                             {/* App Logo Image */}
-                            <img src={require("./../images/logo.png")} alt="logo" height="50px" width="max-width" onClick={()=>navigate('/R324Tracker')}
+                            <img src={require("./../images/logo.png")} alt="logo" height="50px" width="max-width" //onClick={()=>navigate('/R324Tracker')}
                                 style={{filter:'drop-shadow(2px 2px 0px black)'}}/>
                             
                             {/* Online-Offline Status Bubble */}
@@ -138,12 +159,25 @@ function Layout({children}) {
                                             <div style={{fontSize:'10px'}}>Settings</div>
                                         </div>
 
-                                        {/* Dropdown Button to Save as .JSON */}
-                                        <div onClick={()=>handleSaveLogJSON()} onMouseOver={e=>e.currentTarget.style.backgroundColor = 'var(--thir-backgroundColor)'} onMouseOut={e=>e.currentTarget.style.backgroundColor = 'var(--sec-backgroundColor)'}
-                                            style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center',width:'100%', backgroundColor:'var(--sec-backgroundColor)', boxShadow:'var(--main-boxShadow)', cursor:'pointer', padding:'5px', borderRadius:'5px', marginTop:'5px'}}>
-                                            <div style={{fontSize:'10px'}}>Save Log</div>
-                                            <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M22.15 6.525V18.75q0 1.425-.987 2.413-.988.987-2.413.987H5.25q-1.425 0-2.412-.987-.988-.988-.988-2.413V5.25q0-1.425.988-2.413.987-.987 2.412-.987h12.225Zm-3.4 1.425-2.7-2.7H5.25v13.5h13.5ZM12 17.825q1.3 0 2.213-.912.912-.913.912-2.213t-.912-2.213q-.913-.912-2.213-.912t-2.212.912q-.913.913-.913 2.213t.913 2.213q.912.912 2.212.912Zm-5.825-7.4h9.3v-4.25h-9.3ZM5.25 7.95v10.8-13.5Z"/></svg>
-                                            <div style={{fontSize:'10px'}}>.JSON</div>
+                                        <div style={{position:'relative'}}>
+
+                                            {/* Dropdown Button to Save as .JSON */}
+                                            <div onClick={()=>handleSaveLogJSON()} onMouseOver={e=>e.currentTarget.style.backgroundColor = 'var(--thir-backgroundColor)'} onMouseOut={e=>e.currentTarget.style.backgroundColor = 'var(--sec-backgroundColor)'}
+                                                style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center',width:'100%', backgroundColor:'var(--sec-backgroundColor)', boxShadow:'var(--main-boxShadow)', cursor:'pointer', padding:'5px', borderRadius:'5px', marginTop:'5px'}}>
+                                                <div style={{fontSize:'10px'}}>Save Log</div>
+                                                <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M22.15 6.525V18.75q0 1.425-.987 2.413-.988.987-2.413.987H5.25q-1.425 0-2.412-.987-.988-.988-.988-2.413V5.25q0-1.425.988-2.413.987-.987 2.412-.987h12.225Zm-3.4 1.425-2.7-2.7H5.25v13.5h13.5ZM12 17.825q1.3 0 2.213-.912.912-.913.912-2.213t-.912-2.213q-.913-.912-2.213-.912t-2.212.912q-.913.913-.913 2.213t.913 2.213q.912.912 2.212.912Zm-5.825-7.4h9.3v-4.25h-9.3ZM5.25 7.95v10.8-13.5Z"/></svg>
+                                                <div style={{fontSize:'10px'}}>.JSON</div>
+                                            </div>
+
+                                            {/* Dropdown Button to Save as .CVS */}
+                                            <div onClick={()=>handleSaveLogCVS()} onMouseOver={e=>e.currentTarget.style.backgroundColor = 'var(--thir-backgroundColor)'} onMouseOut={e=>e.currentTarget.style.backgroundColor = 'var(--sec-backgroundColor)'}
+                                                style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center',width:'100%', backgroundColor:'var(--sec-backgroundColor)', boxShadow:'var(--main-boxShadow)', cursor:'pointer', padding:'5px', borderRadius:'5px', position:'absolute', right:'105%', top:0}}>
+                                                <div style={{fontSize:'10px'}}>Save Log</div>
+                                                <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" width="24"><path d="M22.15 6.525V18.75q0 1.425-.987 2.413-.988.987-2.413.987H5.25q-1.425 0-2.412-.987-.988-.988-.988-2.413V5.25q0-1.425.988-2.413.987-.987 2.412-.987h12.225Zm-3.4 1.425-2.7-2.7H5.25v13.5h13.5ZM12 17.825q1.3 0 2.213-.912.912-.913.912-2.213t-.912-2.213q-.913-.912-2.213-.912t-2.212.912q-.913.913-.913 2.213t.913 2.213q.912.912 2.212.912Zm-5.825-7.4h9.3v-4.25h-9.3ZM5.25 7.95v10.8-13.5Z"/></svg>
+                                                <div style={{fontSize:'10px'}}>.CVS</div>
+                                            </div>
+                                            
+
                                         </div>
 
                                         {/* Dropdown Button to Load .JSON */}
@@ -163,7 +197,7 @@ function Layout({children}) {
                                         </div>
 
                                         {/* Clear Requests */}
-                                        <div onClick={()=>handleClearRequests()} onMouseOver={e=>e.currentTarget.style.backgroundColor = 'var(--thir-backgroundColor)'} onMouseOut={e=>e.currentTarget.style.backgroundColor = 'var(--sec-backgroundColor)'}
+                                        <div id='Layout_clearRequests' onClick={()=>handleClearRequests()} onMouseOver={e=>e.currentTarget.style.backgroundColor = 'var(--thir-backgroundColor)'} onMouseOut={e=>e.currentTarget.style.backgroundColor = 'var(--sec-backgroundColor)'}
                                             style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center',width:'100%', backgroundColor:'var(--sec-backgroundColor)', boxShadow:'var(--main-boxShadow)', cursor:'pointer', padding:'5px', borderRadius:'5px', marginTop:'5px'}}>
                                             <div style={{fontSize:'10px'}}>Clear</div>
                                             <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" viewBox="0 96 960 960" width="24"><path d="M624 871V766h186v105H624Zm0-353V413h308v105H624Zm0 177V589h267v106H624ZM69 418H28V282h180v-67h212v67h179v136h-41v350q0 57.125-39.438 96.562Q479.125 904 422 904H205q-57.125 0-96.562-39.438Q69 825.125 69 768V418Z"/></svg>
