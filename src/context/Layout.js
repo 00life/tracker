@@ -11,7 +11,7 @@ import './Dropdown.css';
 
 
 function Layout({children}) {
-    const { func_logout, func_snackbar, logArray, setLogArray, authstatus, reference } = useAuth();
+    const { func_logout, func_snackbar, logArray, setLogArray, notify, authstatus, reference } = useAuth();
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState('');
@@ -79,18 +79,36 @@ function Layout({children}) {
     };
 
     const handleClearRequests = () =>{
-        let timestamp = new Date().getTime();
+        let count = 0;
+        let TRIES = 10;
+        let callback = data =>{
+            count++;
+            if(data?.uid){
+                clearInterval(interval);
+
+                let timestamp = new Date().getTime();
         
-        // Clear firebase request
-        funcAuth_setData(`/users/${auth.currentUser.uid}/requests`, '');
-        funcAuth_updateData(`/users/${auth.currentUser.uid}/requests`, {timestamp: timestamp});
-        
-        // Clear firebase watch
-        funcAuth_setData(`/users/${auth.currentUser.uid}/watch`, '');
-        funcAuth_updateData(`/users/${auth.currentUser.uid}/watch`, {timestamp: timestamp});
-        
-        // Notification
-        func_snackbar(reference,'Requests Cleared');
+                // Clear firebase request
+                funcAuth_setData(`/users/${data.uid}/requests`, '');
+                funcAuth_updateData(`/users/${data.uid}/requests`, {timestamp: timestamp});
+                
+                // Clear firebase watch
+                funcAuth_setData(`/users/${data.uid}/watch`, '');
+                funcAuth_updateData(`/users/${data.uid}/watch`, {timestamp: timestamp});
+                
+                // Notification
+                func_snackbar(reference,'Requests Cleared');
+
+                // Close menu
+                reference.current.querySelector('#checkbox-link').click();
+
+            }else if(count > TRIES){return}
+        };;//Callback Host
+        let interval = setInterval(()=>callback(auth.currentUser),1000);
+    };
+
+    const handleTest = ()=>{
+        window.localStorage.clear();
     };
 
     
@@ -120,7 +138,7 @@ function Layout({children}) {
                             
                             {/* App Logo Image */}
                             <img src={require("./../images/logo.png")} alt="logo" height="50px" width="max-width" //onClick={()=>navigate('/R324Tracker')}
-                                style={{filter:'drop-shadow(2px 2px 0px black)'}}/>
+                                onClick={()=>{handleTest()}} style={{filter:'drop-shadow(2px 2px 0px black)'}}/>
                             
                             {/* Online-Offline Status Bubble */}
                             <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} id="indicator-online" width="24px" height="24px" viewBox="0 0 24 24" fill={!authstatus?"none":"var(--tetradicGreen)"} >
@@ -203,7 +221,7 @@ function Layout({children}) {
                                             <svg style={{filter:'drop-shadow(2px 2px 1px #8888)'}} height="24" viewBox="0 96 960 960" width="24"><path d="M624 871V766h186v105H624Zm0-353V413h308v105H624Zm0 177V589h267v106H624ZM69 418H28V282h180v-67h212v67h179v136h-41v350q0 57.125-39.438 96.562Q479.125 904 422 904H205q-57.125 0-96.562-39.438Q69 825.125 69 768V418Z"/></svg>
                                             <div style={{fontSize:'10px'}}>Requests</div>
                                         </div>
-                                    
+
                                     </div>
                                 </div>
 
@@ -228,7 +246,13 @@ function Layout({children}) {
 
             {/* Request Button */}
             <button id="request" data-dest="/request" onClick={(e)=>handleButtonEvent(e)} style={{pointerboxShadow:"var(--main-boxShadow)", height:"40px", width:"40px", cursor:'pointer'}}>
-                <svg  style={{filter:'drop-shadow(2px 2px 1px #8888)'}} fill={currentPage==='/request'?'var(--selectBlue)':''} height="24" width="24"><path d="M.5 17.825V1.7q0-.6.413-1Q1.325.3 1.925.3H16.05q.625 0 1.025.4.4.4.4 1v10.05q0 .625-.413 1.025-.412.4-1.012.4H5.15ZM6.9 19.2q-.625 0-1.025-.412-.4-.413-.4-1.038v-2.575h14v-9.85h2.6q.6 0 1.012.4.413.4.413 1V23.75l-4.575-4.55Zm7.5-15.825H3.575V10.6l.5-.5H14.4Zm-10.825 0V10.6Z"/></svg>
+                <div style={{position:'relative'}}>
+
+                    <svg  style={{filter:'drop-shadow(2px 2px 1px #8888)'}} fill={currentPage==='/request'?'var(--selectBlue)':''} height="24" width="24"><path d="M.5 17.825V1.7q0-.6.413-1Q1.325.3 1.925.3H16.05q.625 0 1.025.4.4.4.4 1v10.05q0 .625-.413 1.025-.412.4-1.012.4H5.15ZM6.9 19.2q-.625 0-1.025-.412-.4-.413-.4-1.038v-2.575h14v-9.85h2.6q.6 0 1.012.4.413.4.413 1V23.75l-4.575-4.55Zm7.5-15.825H3.575V10.6l.5-.5H14.4Zm-10.825 0V10.6Z"/></svg>
+                    
+                    <svg id='Layout_notify' fill='var(--monochromaticBlue)' stroke='black' height="20" width="20" style={{display: notify ? 'block' : 'none', position:'absolute', left:'50%', top:'50%', transform:'translateX(-50%)'}}><path d="M2.667 16.125v-2.667h1.229V9.417q0-2.084 1.239-3.75Q6.375 4 8.417 3.562v-.979q0-.666.458-1.125Q9.333 1 10 1t1.125.458q.458.459.458 1.125v.979q2.063.417 3.292 2.084 1.229 1.666 1.229 3.771v4.041h1.25v2.667Zm7.354 2.792q-.771 0-1.313-.542-.541-.542-.541-1.292h3.687q0 .771-.542 1.302-.541.532-1.291.532Z"/></svg>
+                    
+                </div>
             </button>
 
             {/* Participant Button */}

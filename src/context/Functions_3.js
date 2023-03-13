@@ -1,6 +1,5 @@
 import { auth } from "./Firebase";
-import { funcAuth_loadValData, funcAuth_setData } from "./Functions_Auth";
-import preval from 'babel-plugin-preval/macro';
+import { funcAuth_loadData, funcAuth_loadValData, funcAuth_setData } from "./Functions_Auth";
 
 
 export function func3_stripStoragePersons(persons){
@@ -74,4 +73,49 @@ export function func3_handleHashWatch(type, hash){
         });
     } ;; // Callback Host from the USER
     funcAuth_loadValData(`users/${auth.currentUser.uid}/watch`, callback)
+};
+
+export function func3_requestNotify(){  
+    try{
+        let count = 0;
+        let TRIES = 10;
+        
+        let callback = data => {
+            count++;
+            if(data?.uid){
+                clearInterval(interval);
+                let callback2 = data2 => {
+                    let sentReceive = [];
+                    let confirms = [];
+                    let doubleArray = [];
+                    let objArray = Object.values(data2)
+                    
+                    objArray.forEach(obj=>{
+                        if(obj.type === 'sent' || obj.type === 'receive'){
+                            sentReceive.push(obj.timestamp)
+                        }else if(obj.type === 'confirm'){
+                            confirms.push(obj.timestamp)
+                        };                    
+                    });
+                    
+                    sentReceive.forEach(val=>{
+                        confirms.includes(val) ? doubleArray.push(true) : doubleArray.push(false);
+                    })
+
+                    let result = doubleArray?.every(val=>val);
+                    let finalResult = (result===undefined||result===null) ? false : result;
+                    
+                    if(finalResult){
+                        window.document.querySelector('#Layout_notify').style.display = 'none';
+                    }else{
+                        window.document.querySelector('#Layout_notify').style.display = 'block';
+                    };
+
+                };;//Callback2 Host
+                funcAuth_loadData(`users/${data.uid}/requests`,callback2)
+
+            }else if(count > TRIES ){return}
+        };;//Callback Host
+        let interval = setInterval(()=>callback(auth.currentUser),1000);
+    }catch(err){console.log('func3_requestNotify: ' + err)};
 };

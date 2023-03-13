@@ -1,4 +1,3 @@
-// import { func_dataURItoBlob } from "./Functions_1";
 import { auth } from "./Firebase";
 import { funcAuth_loadData } from "./Functions_Auth";
 import beepGo from '../sounds/beep-07a.mp3';
@@ -9,8 +8,8 @@ import beepBack from '../sounds/beep-08b.mp3';
 export function func2_config(configuration, setConfiguration){
 // Load the autoload toggle button to its previous settings
     try{
-        let autoConfig = JSON.parse(window?.localStorage?.getItem('config'));
-        setConfiguration({...configuration, onlineLoadParticipant:!autoConfig.onlineLoadParticipant});
+        let autoConfig = JSON?.parse(window?.localStorage?.getItem('config'));
+        setConfiguration({...configuration, onlineLoadParticipant:!autoConfig?.onlineLoadParticipant});
         return autoConfig
     }catch(err){console.log('func_config:'+err)};
 };
@@ -20,7 +19,7 @@ export function func2_autoLoadPersons(persons, setPersons){
     let TRIES = 10;
     try{
         // Guard-Clause if the toggle is turned off (NOTE: true/false is backwards)
-        if(autoConfig.onlineLoadParticipant){return}
+        if(autoConfig?.onlineLoadParticipant){return}
 
         let count = 0;
 

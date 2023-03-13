@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import Layout from "../context/Layout";
 import ToggleBtn from "../components/ToggleBtn";
 import preval from 'babel-plugin-preval/macro';
+import { funcAuto_autoConfigLoad } from "../context/Functions_Autoload";
 
 
 function AutoConfig(){
@@ -94,24 +95,29 @@ function AutoConfig(){
         });
         
         let autoconfigLS = JSON?.parse(window.localStorage.getItem('autoconfig'));
-        if(autoconfigLS!==undefined||autoconfigLS!==null){
-            // Loading the toggle settings from localStorage
-            reference.current.querySelector('#checkparticipantsWin').checked = autoconfigLS.participantsWin;
-            reference.current.querySelector('#checkprofileWin').checked = autoconfigLS.profileWin;
-            reference.current.querySelector('#checklogWin').checked = autoconfigLS.logWin;
-
-            reference.current.querySelector('#checkparticipantsLin').checked = autoconfigLS.participantsLin;
-            reference.current.querySelector('#checkprofileLin').checked = autoconfigLS.profileLin;
-            reference.current.querySelector('#checklogLin').checked = autoconfigLS.logLin;
-        }else{
+        if(autoconfigLS === undefined || autoconfigLS === null){
+            
             // Loading the toggle settings from autoconfig.txt
-            reference.current.querySelector('#checkparticipantsWin').checked = configuration.participantsWin;
-            reference.current.querySelector('#checkprofileWin').checked = configuration.profileWin;
-            reference.current.querySelector('#checklogWin').checked = configuration.logWin;
+            let obj = funcAuto_autoConfigLoad();
+            
+            reference.current.querySelector('#checkparticipantsWin').checked = obj?.participantsWin;
+            reference.current.querySelector('#checkprofileWin').checked = obj?.profileWin;
+            reference.current.querySelector('#checklogWin').checked = obj?.logWin;
 
-            reference.current.querySelector('#checkparticipantsLin').checked = configuration.participantsLin;
-            reference.current.querySelector('#checkprofileLin').checked = configuration.profileLin;
-            reference.current.querySelector('#checklogLin').checked = configuration.logLin;
+            reference.current.querySelector('#checkparticipantsLin').checked = obj?.participantsLin;
+            reference.current.querySelector('#checkprofileLin').checked = obj?.profileLin;
+            reference.current.querySelector('#checklogLin').checked = obj?.logLin;
+            
+        }else{
+
+            // Loading the toggle settings from localStorage
+            reference.current.querySelector('#checkparticipantsWin').checked = autoconfigLS?.participantsWin;
+            reference.current.querySelector('#checkprofileWin').checked = autoconfigLS?.profileWin;
+            reference.current.querySelector('#checklogWin').checked = autoconfigLS?.logWin;
+
+            reference.current.querySelector('#checkparticipantsLin').checked = autoconfigLS?.participantsLin;
+            reference.current.querySelector('#checkprofileLin').checked = autoconfigLS?.profileLin;
+            reference.current.querySelector('#checklogLin').checked = autoconfigLS?.logLin;
         };
     },[]);
 

@@ -1,22 +1,23 @@
 import React, {useState} from 'react';
 import Avatar from './Avatar';
+import { useAuth } from '../context/AuthContext';
 
 function ModalView2({ids}) {
+    const { reference } = useAuth();
     const [base64, setBase64] = useState('');
     
     const handleDisplayModal = e => {
         let elem_checkbox = e.currentTarget;
-        let hash = window.document.querySelector('#storeHash').value;
-        let base64 = window.document.querySelector('#storeBase64').value;
+        let base64 = reference.current.querySelector('#storeBase64').value;
         setBase64(base64);
         
         // Checkbox Conditions
         if(elem_checkbox.checked){
             e.currentTarget.parentNode.style.display = 'flex';
-            window.document.querySelector('#smallAvatar_'+hash).style.opacity = 0;
+            reference.current.querySelector('#smallAvatar').style.opacity = 0;
         }else{
             e.currentTarget.parentNode.style.display = 'none';
-            window.document.querySelector('#smallAvatar_'+hash).style.opacity = 1;
+            reference.current.querySelector('#smallAvatar').style.opacity = 1;
         };   
     };
 
@@ -25,7 +26,6 @@ function ModalView2({ids}) {
     <div id='ModalView2_main' style={{display:'none', justifyContent:'center'}}>
 
         {/* Recieving data from the BarTrack Page */}
-        <input id="storeHash" type='hidden'/>
         <input id="storeBase64" type='hidden'/>
 
         <style>

@@ -36,6 +36,9 @@ export function funcAuto_autoConfigLoad(){
 export function funcAuto_load_Participants_N_Profile(obj){
     
     try{
+        // Guard-Clause 
+        if(obj === undefined||obj === null){return};    
+
         // Getting the keys and values of autoconfig.txt
         let valArrayAutoConfig = Object.values(obj);
         let keyArrayAutoConfig = Object.keys(obj);

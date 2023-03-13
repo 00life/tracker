@@ -71,7 +71,6 @@ function BarTrack(){
         reference.current.querySelector('#ModalView2_schedule').innerHTML = html_schedule;
         
         // Sending data to ModalView2
-        reference.current.querySelector('#storeHash').value = hash;
         reference.current.querySelector('#storeBase64').value = filteredPerson.base64;
 
     };
@@ -116,11 +115,11 @@ function BarTrack(){
                 </div>
             </div>
 
-            <div style={{display:'flex', height:'60vh'}}>
+            <div id={'smallAvatar'} style={{display:'flex', height:'60vh'}}>
                 <div style={{width: '100%', display:'flex', boxShadow:'1px 1px 4px 0px #8888', padding:'15px'}}>
                     {outPeople.map((obj,i)=>(
                         <div key={i}>
-                            <div id={'smallAvatar_'+obj.hash} style={{margin:'5px', position:'relative'}}>
+                            <div style={{margin:'5px', position:'relative'}}>
 
                                 {/* Timer Display */}
                                 <div className='textDesign1' style={{position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', 

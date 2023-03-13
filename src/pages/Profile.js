@@ -166,30 +166,41 @@ function Profile() {//fix
 
   const handleSaveProfile = ()=>{
     try{
-      // Updating profileData object
-      setProfileData({...profileData, firstname: firstname, lastname: lastname, email: email, schedule: onSchedule});
+      let count = 0;
+      let TRIES = 10;
 
-      // Update Firebase displayName
-      let myDisplayName = (firstname + (lastname !== '' ? `_${lastname}` : '')).trim();
-      funcAuth_updateProfile({...auth.currentUser, displayName: (myDisplayName !== '') ? myDisplayName : auth.currentUser.email});
-      
-      // Creating the object to save to file
-      let profileObj = {
-        firstname: firstname !=='' ? firstname : profileData.firstname,
-        lastname: lastname !=='' ? lastname : profileData.lastname,
-        uid: auth.currentUser.uid,
-        email: email === '' ? auth.currentUser.email : funcAuth_updateEmail(email),
-        schedule: onSchedule !==[] ? onSchedule : profileData.schedule,
-        contactList: profileData.contactList ?? [],
-        base64: profileData.base64,
-        
-      };
+      let callback = data =>{
+        count++;
+        if(data.uid){
+          clearInterval(interval);
 
-      // Generating the name of the file
-      let saveStringName = `profile_${func2_stringDateName()}.json`;
+          // Updating profileData object
+          setProfileData({...profileData, firstname: firstname, lastname: lastname, email: email, uid: data.uid ,schedule: onSchedule});
+
+          // Update Firebase displayName
+          let myDisplayName = (firstname + (lastname !== '' ? `_${lastname}` : '')).trim();
+          funcAuth_updateProfile({...data, displayName: (myDisplayName !== '') ? myDisplayName : data.email});
+
+           // Creating the object to save to file
+          let profileObj = {
+          firstname: firstname !=='' ? firstname : profileData.firstname,
+          lastname: lastname !=='' ? lastname : profileData.lastname,
+          uid: data.uid,
+          email: email === '' ? data.email : funcAuth_updateEmail(email),
+          schedule: onSchedule !==[] ? onSchedule : profileData.schedule,
+          contactList: profileData.contactList ?? [],
+          base64: profileData.base64,
+          };
+
+          // Generating the name of the file
+          let saveStringName = `profile_${func2_stringDateName()}.json`;
       
-      // Saving the file to the computer
-      func_savedata(profileObj, saveStringName, '/profile', reference);
+          // Saving the file to the computer
+          func_savedata(profileObj, saveStringName, '/profile', reference);
+
+        }else if(count > TRIES){return}
+      };;//Callback Host
+      let interval = setInterval(()=>callback(auth.currentUser), 1000);
       
     }catch(err){console.log('handleSaveProfile: ' + err)}
   };

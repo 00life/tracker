@@ -68,92 +68,118 @@ function RequestOptions(){
 
     const handleRequestSend = () =>{
         try{
-            let uid = reference.current.querySelector('#requestOptions_rename').dataset.uid;
-            let elemParticipantArray = reference.current.querySelectorAll('.requestOptionsCheckbox');
-            
-            // Getting the element containing uid of the contact
-            let elem = reference.current.querySelector('#requestOptions_rename');
-            // Getting the element that contains the contactName
-            let objContact = profileData.contactList.filter(obj=>(obj.uid === elem.dataset.uid))[0];
-            
+            let count = 0;
+            let TRIES = 10;
+            let callback = data => {
+                count++;
+                if(data.uid){
+                    clearInterval(interval);
 
-            // Create a hashArray if the participant is selected
-            let hashArray = [];
-            elemParticipantArray.forEach(elem=>{
-                if(elem.checked){hashArray.push(elem.id.slice(8,))}
-            });
+                    let uid = reference.current.querySelector('#requestOptions_rename').dataset.uid;
+                    let elemParticipantArray = reference.current.querySelectorAll('.requestOptionsCheckbox');
+                    
+                    // Getting the element containing uid of the contact
+                    let elem = reference.current.querySelector('#requestOptions_rename');
+                    // Getting the element that contains the contactName
+                    let objContact = profileData.contactList.find(obj=>(obj.uid === elem.dataset.uid));
+                    
+                    // Create a hashArray if the participant is selected
+                    let hashArray = [];
+                    elemParticipantArray.forEach(elem=>{
+                        if(elem.checked){hashArray.push(elem.id.slice(8,))}
+                    });
 
-            // Guard-Clause if hashArray is empty
-            if(hashArray.length===0){return};
+                    // Guard-Clause if hashArray is empty
+                    if(hashArray.length===0){return};
 
-            // Create an array of selected person objects
-            let recipientArray = [];
-            let senderArray = [];
-            hashArray.forEach(hash=>{
-                let filterPerson = persons.filter(obj=>obj.hash === hash)[0];
-                let dateNow = new Date().getTime();
-                
-                let recipientObj = {...filterPerson, type: 'receive', timestamp: dateNow, sender: auth.currentUser.uid, arriveTime: '~', leaveTime: '~', senderName: auth.currentUser.displayName};
-                let senderObj = {...filterPerson, type: 'sent', timestamp: dateNow, sender: auth.currentUser.uid, arriveTime: '~', leaveTime: '~', receiverName: objContact.contactName};
-                
-                recipientArray.push(recipientObj);
-                senderArray.push(senderObj);
-            });
-            
-            // Send object recipient and sender in Firebase
-            recipientArray.forEach(obj=>{funcAuth_updateData(`/users/${uid}/requests`, obj)});
-            senderArray.forEach(obj=>{funcAuth_updateData(`/users/${auth.currentUser.uid}/requests`, obj)});
-            
-            // Clear inputs and checkboxes and searchResults
-            elemParticipantArray.forEach(elem=>{if(elem.checked){elem.click()}});
-            reference.current.querySelector('#requestOptions_search').value = '';
-            setSearchResults([]);
-            reference.current.querySelector('.close').click();
+                    // Create an array of selected person objects
+                    let recipientArray = [];
+                    let senderArray = [];
+
+                    hashArray.forEach(hash=>{
+                        let filterPerson = persons.find(obj=>obj.hash === hash);
+                        let dateNow = new Date().getTime();
+                        
+                        let recipientObj = {...filterPerson, type: 'receive', timestamp: dateNow, sender: data.uid, arriveTime: '~', leaveTime: '~', senderName: data.displayName};
+                        let senderObj = {...filterPerson, type: 'sent', timestamp: dateNow, sender: data.uid, arriveTime: '~', leaveTime: '~', receiverName: objContact.contactName};
+                        
+                        recipientArray.push(recipientObj);
+                        senderArray.push(senderObj);
+                    });
+                    
+                    // Send object recipient and sender in Firebase
+                    recipientArray.forEach(obj=>{funcAuth_updateData(`/users/${uid}/requests`, obj)});
+                    senderArray.forEach(obj=>{funcAuth_updateData(`/users/${data.uid}/requests`, obj)});
+                    
+                    // Clear inputs and checkboxes and searchResults
+                    elemParticipantArray.forEach(elem=>{if(elem.checked){elem.click()}});
+                    reference.current.querySelector('#requestOptions_search').value = '';
+                    setSearchResults([]);
+                    reference.current.querySelector('.close').click();
+
+                }else if(count > TRIES){return}
+
+            };; //Callback Host
+            let interval = setInterval(()=>callback(auth.currentUser),1000);
             
         }catch(err){console.log('handleRequestSend: ' + err)}
     };
 
     const handleRequestTake = () =>{
-        let uid = reference.current.querySelector('#requestOptions_rename').dataset.uid;
-        let elemParticipantArray = reference.current.querySelectorAll('.requestOptionsCheckbox');
+        try{
+            let count = 0;
+            let TRIES = 10;
+            let callback = data => {
+                count++;
+                if(data.uid){
+                    clearInterval(interval);
 
-        // Getting the element containing uid of the contact
-        let elem = reference.current.querySelector('#requestOptions_rename');
-        // Getting the element that contains the contactName
-        let objContact = profileData.contactList.filter(obj=>(obj.uid === elem.dataset.uid))[0];
+                    let uid = reference.current.querySelector('#requestOptions_rename').dataset.uid;
+                    let elemParticipantArray = reference.current.querySelectorAll('.requestOptionsCheckbox');
 
-        // Create a hashArray if the participant is selected
-        let hashArray = [];
-        elemParticipantArray.forEach(elem=>{
-            if(elem.checked){hashArray.push(elem.id.slice(8,))}
-        });
+                    // Getting the element containing uid of the contact
+                    let elem = reference.current.querySelector('#requestOptions_rename');
+                    // Getting the element that contains the contactName
+                    let objContact = profileData.contactList.find(obj=>(obj.uid === elem.dataset.uid));
 
-        // Guard-Clause if hashArray is empty
-        if(hashArray.length===0){return};
+                    // Create a hashArray if the participant is selected
+                    let hashArray = [];
+                    elemParticipantArray.forEach(elem=>{
+                        if(elem.checked){hashArray.push(elem.id.slice(8,))}
+                    });
 
-        // Create an array of selected person objects
-        let recipientArray = [];
-        let senderArray = [];
-        hashArray.forEach(hash=>{
-            let filterPerson = persons.filter(obj=>obj.hash === hash)[0];
-            let dateNow = new Date().getTime();
-            
-            let recipientObj = {...filterPerson, type: 'take_receive', timestamp: dateNow, sender: auth.currentUser.uid, arriveTime: '~', leaveTime: '~', senderName: auth.currentUser.displayName};
-            let senderObj = {...filterPerson, type: 'take_sent', timestamp: dateNow, sender: auth.currentUser.uid, arriveTime: '~', leaveTime: '~', receiverName: objContact.contactName};
-            
-            recipientArray.push(recipientObj);
-            senderArray.push(senderObj);
-        });
+                    // Guard-Clause if hashArray is empty
+                    if(hashArray.length===0){return};
 
-        // Send object recipient and sender in Firebase
-        recipientArray.forEach(obj=>{funcAuth_updateData(`/users/${uid}/requests`, obj)});
-        senderArray.forEach(obj=>{funcAuth_updateData(`/users/${auth.currentUser.uid}/requests`, obj)});
-        
-        // Clear inputs and checkboxes and searchResults
-        elemParticipantArray.forEach(elem=>{if(elem.checked){elem.click()}});
-        reference.current.querySelector('#requestOptions_search').value = '';
-        setSearchResults([]);
-        reference.current.querySelector('.close').click();
+                    // Create an array of selected person objects
+                    let recipientArray = [];
+                    let senderArray = [];
+                    hashArray.forEach(hash=>{
+                        let filterPerson = persons.find(obj=>obj.hash === hash);
+                        let dateNow = new Date().getTime();
+                        
+                        let recipientObj = {...filterPerson, type: 'take_receive', timestamp: dateNow, sender: data.uid, arriveTime: '~', leaveTime: '~', senderName: data.displayName};
+                        let senderObj = {...filterPerson, type: 'take_sent', timestamp: dateNow, sender: data.uid, arriveTime: '~', leaveTime: '~', receiverName: objContact.contactName};
+                        
+                        recipientArray.push(recipientObj);
+                        senderArray.push(senderObj);
+                    });
+
+                    // Send object recipient and sender in Firebase
+                    recipientArray.forEach(obj=>{funcAuth_updateData(`/users/${uid}/requests`, obj)});
+                    senderArray.forEach(obj=>{funcAuth_updateData(`/users/${data.uid}/requests`, obj)});
+                    
+                    // Clear inputs and checkboxes and searchResults
+                    elemParticipantArray.forEach(elem=>{if(elem.checked){elem.click()}});
+                    reference.current.querySelector('#requestOptions_search').value = '';
+                    setSearchResults([]);
+                    reference.current.querySelector('.close').click();
+
+                }else if(count > TRIES){return};
+
+            };;//Callback Host
+            let interval = setInterval(()=>callback(auth.currentUser),1000);
+        }catch(err){console.log('handleRequestTake: '+ err)}
 
     };
 
